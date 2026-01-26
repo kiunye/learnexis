@@ -1,0 +1,38 @@
+<%# Admin Summary Metrics %>
+<%= turbo_frame_tag "widget_metrics_admin" do %>
+  <div class="card bg-white shadow-md">
+    <div class="card-body">
+      <h2 class="card-title text-lg font-bold text-gray-900 mb-4">Overview</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-gray-600">Total Students</p>
+          <p class="text-2xl font-bold text-gray-900">0</p>
+          <p class="text-xs text-gray-500 mt-1">
+            <span class="text-green-600">+0%</span> from last month
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Total Classrooms</p>
+          <p class="text-2xl font-bold text-gray-900">0</p>
+          <p class="text-xs text-gray-500 mt-1">
+            <span class="text-gray-500">No change</span>
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Pending Fees</p>
+          <p class="text-2xl font-bold text-red-600">$0</p>
+          <p class="text-xs text-gray-500 mt-1">
+            <span class="text-red-600">0 invoices</span>
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Attendance Rate</p>
+          <p class="text-2xl font-bold text-gray-900">0%</p>
+          <p class="text-xs text-gray-500 mt-1">
+            <span class="text-gray-500">Today</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

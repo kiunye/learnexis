@@ -1,0 +1,38 @@
+<%# Student Summary Metrics %>
+<%= turbo_frame_tag "widget_metrics_student" do %>
+  <div class="card bg-white shadow-md">
+    <div class="card-body">
+      <h2 class="card-title text-lg font-bold text-gray-900 mb-4">My Progress</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-gray-600">Attendance</p>
+          <p class="text-2xl font-bold text-green-600">0%</p>
+          <p class="text-xs text-gray-500 mt-1">
+            <span class="text-gray-500">This month</span>
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Class</p>
+          <p class="text-2xl font-bold text-gray-900">-</p>
+          <p class="text-xs text-gray-500 mt-1">
+            <span class="text-gray-500">Not assigned</span>
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Outstanding Fees</p>
+          <p class="text-2xl font-bold text-red-600">$0</p>
+          <p class="text-xs text-gray-500 mt-1">
+            <span class="text-gray-500">0 invoices</span>
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Upcoming Events</p>
+          <p class="text-2xl font-bold text-blue-600">0</p>
+          <p class="text-xs text-gray-500 mt-1">
+            <span class="text-gray-500">This week</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -1,10 +1,40 @@
 <div>
-  <h1 class="text-3xl font-bold text-gray-900 mb-4">Dashboard</h1>
-  <p class="text-lg text-gray-700">Welcome, <%= Current.user&.email_address %>!</p>
-  <p class="text-sm text-gray-600 mt-2">
-    Role: <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
-      <%= Current.user&.role&.humanize || "Role" %>
-    </span>
-  </p>
-  <p class="mt-4 text-gray-600">Dashboard widgets will be implemented in Task 6.</p>
+  <%# Page Header %>
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+    <p class="text-gray-600 mt-1">Welcome back, <%= Current.user&.email_address&.split("@")&.first&.capitalize || "User" %>!</p>
+  </div>
+
+  <%# Responsive Grid Layout: 3 columns desktop, 2 tablet, 1 mobile %>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    
+    <%# Summary Metric Cards - Role-specific %>
+    <% if Current.user&.admin? %>
+      <%= render "dashboards/widget_metrics_admin" %>
+    <% elsif Current.user&.teacher? %>
+      <%= render "dashboards/widget_metrics_teacher" %>
+    <% elsif Current.user&.parent? %>
+      <%= render "dashboards/widget_metrics_parent" %>
+    <% else %>
+      <%= render "dashboards/widget_metrics_student" %>
+    <% end %>
+
+    <%# Stats Component - Multi-metric Display %>
+    <%= render "dashboards/widget_stats" %>
+
+    <%# Progress Cards %>
+    <%= render "dashboards/widget_progress" %>
+
+    <%# List Cards with Icons %>
+    <%= render "dashboards/widget_list" %>
+
+    <%# Table Cards %>
+    <%= render "dashboards/widget_table_recent" %>
+    <%= render "dashboards/widget_table_upcoming" %>
+
+    <%# Chart Cards (Placeholder - will use Chartkick when installed) %>
+    <%= render "dashboards/widget_chart_attendance" %>
+    <%= render "dashboards/widget_chart_financial" %>
+
+  </div>
 </div>
