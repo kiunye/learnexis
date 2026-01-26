@@ -1,3 +1,6 @@
+<%# Subscribe to dashboard updates via Turbo Streams %>
+<%= turbo_stream_from "dashboard:#{Current.user&.id}" %>
+
 <div>
   <%# Page Header %>
   <div class="mb-6">
