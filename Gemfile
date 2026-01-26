@@ -21,6 +21,12 @@ gem "jbuilder"
 # Tailwind CSS for styling [https://tailwindcss.com]
 gem "tailwindcss-rails"
 
+# Authorization [https://github.com/varvet/pundit]
+gem "pundit"
+
+# Pagination [https://github.com/ddnexus/pagy]
+gem "pagy"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 
@@ -67,4 +73,9 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+
+  # RSpec testing framework [https://rspec.info/]
+  gem "rspec-rails"
+  gem "factory_bot_rails"
+  gem "faker"
 end
