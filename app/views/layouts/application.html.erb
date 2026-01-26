@@ -11,6 +11,11 @@
 
     <%= yield :head %>
 
+    <%# Lexend Deca font from Google Fonts %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
@@ -23,9 +28,29 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
-      <%= yield %>
-    </main>
+  <body class="font-sans" style="font-family: 'Lexend Deca', ui-sans-serif, system-ui, sans-serif;">
+    <%# DaisyUI Drawer Layout %>
+    <div class="drawer lg:drawer-open">
+      <input id="drawer-toggle" type="checkbox" class="drawer-toggle" />
+      
+      <%# Main content area %>
+      <div class="drawer-content flex flex-col">
+        <%# Header %>
+        <%= render "shared/header" %>
+        
+        <%# Main content %>
+        <main class="flex-1 overflow-y-auto bg-gray-50">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <%= yield %>
+          </div>
+        </main>
+      </div>
+      
+      <%# Sidebar %>
+      <%= render "shared/sidebar" %>
+    </div>
+
+    <%# Flash messages %>
+    <%= render "shared/flash_messages" %>
   </body>
 </html>
