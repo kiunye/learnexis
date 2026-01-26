@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  admission_number: MyString
+  date_of_birth: 2026-01-26
+  admission_date: 2026-01-26
+  status: 1
+  medical_conditions: MyText
+  allergies: MyText
+  special_needs: MyText
+  emergency_contact_name: MyString
+  emergency_contact_phone: MyString
+  blood_group: MyString
+  user: one
+  classroom: one
+
+two:
+  admission_number: MyString
+  date_of_birth: 2026-01-26
+  admission_date: 2026-01-26
+  status: 1
+  medical_conditions: MyText
+  allergies: MyText
+  special_needs: MyText
+  emergency_contact_name: MyString
+  emergency_contact_phone: MyString
+  blood_group: MyString
+  user: two
+  classroom: two
