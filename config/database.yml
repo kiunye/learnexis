@@ -20,21 +20,60 @@ test:
   <<: *default
   database: storage/test.sqlite3
 
-# Store production database in the storage/ directory, which by default
-# is mounted as a persistent Docker volume in config/deploy.yml.
+# Production uses PostgreSQL via environment variables
+# Set DATABASE_URL or individual connection parameters:
+#   DATABASE_URL=postgresql://user:password@hostname:port/database
+#   Or use individual env vars: DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
 production:
   primary:
-    <<: *default
-    database: storage/production.sqlite3
+    adapter: postgresql
+    encoding: unicode
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+    host: <%= ENV.fetch("DB_HOST") { "localhost" } %>
+    port: <%= ENV.fetch("DB_PORT") { 5432 } %>
+    username: <%= ENV.fetch("DB_USER") { "postgres" } %>
+    password: <%= ENV.fetch("DB_PASSWORD") { "" } %>
+    database: <%= ENV.fetch("DB_NAME") { "learnexis_production" } %>
+    # Use DATABASE_URL if provided (takes precedence over individual vars)
+    <% if ENV["DATABASE_URL"] %>
+    url: <%= ENV["DATABASE_URL"] %>
+    <% end %>
   cache:
-    <<: *default
-    database: storage/production_cache.sqlite3
+    adapter: postgresql
+    encoding: unicode
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+    host: <%= ENV.fetch("DB_HOST") { "localhost" } %>
+    port: <%= ENV.fetch("DB_PORT") { 5432 } %>
+    username: <%= ENV.fetch("DB_USER") { "postgres" } %>
+    password: <%= ENV.fetch("DB_PASSWORD") { "" } %>
+    database: <%= ENV.fetch("DB_CACHE_NAME") { "learnexis_production_cache" } %>
     migrations_paths: db/cache_migrate
+    <% if ENV["DATABASE_CACHE_URL"] %>
+    url: <%= ENV["DATABASE_CACHE_URL"] %>
+    <% end %>
   queue:
-    <<: *default
-    database: storage/production_queue.sqlite3
+    adapter: postgresql
+    encoding: unicode
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+    host: <%= ENV.fetch("DB_HOST") { "localhost" } %>
+    port: <%= ENV.fetch("DB_PORT") { 5432 } %>
+    username: <%= ENV.fetch("DB_USER") { "postgres" } %>
+    password: <%= ENV.fetch("DB_PASSWORD") { "" } %>
+    database: <%= ENV.fetch("DB_QUEUE_NAME") { "learnexis_production_queue" } %>
     migrations_paths: db/queue_migrate
+    <% if ENV["DATABASE_QUEUE_URL"] %>
+    url: <%= ENV["DATABASE_QUEUE_URL"] %>
+    <% end %>
   cable:
-    <<: *default
-    database: storage/production_cable.sqlite3
+    adapter: postgresql
+    encoding: unicode
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+    host: <%= ENV.fetch("DB_HOST") { "localhost" } %>
+    port: <%= ENV.fetch("DB_PORT") { 5432 } %>
+    username: <%= ENV.fetch("DB_USER") { "postgres" } %>
+    password: <%= ENV.fetch("DB_PASSWORD") { "" } %>
+    database: <%= ENV.fetch("DB_CABLE_NAME") { "learnexis_production_cable" } %>
     migrations_paths: db/cable_migrate
+    <% if ENV["DATABASE_CABLE_URL"] %>
+    url: <%= ENV["DATABASE_CABLE_URL"] %>
+    <% end %>

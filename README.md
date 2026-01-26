@@ -33,6 +33,7 @@ bun install
 
 ### 4. Set up the database
 
+**Development/Test (SQLite):**
 ```bash
 # Create and migrate databases
 bin/rails db:create
@@ -40,6 +41,31 @@ bin/rails db:migrate
 
 # (Optional) Load seed data for development
 bin/rails db:seed
+```
+
+**Production (PostgreSQL):**
+
+The application uses PostgreSQL in production. Configure your database connection using environment variables:
+
+**Option 1: Use DATABASE_URL (recommended)**
+```bash
+export DATABASE_URL=postgresql://username:password@hostname:port/database_name
+```
+
+**Option 2: Use individual connection parameters**
+```bash
+export DB_HOST=localhost
+export DB_PORT=5432
+export DB_USER=postgres
+export DB_PASSWORD=your_password
+export DB_NAME=learnexis_production
+```
+
+See the "Environment Configuration" section below for a complete list of environment variables.
+
+**Note:** Make sure the `pg` gem is installed for PostgreSQL support:
+```bash
+bundle install
 ```
 
 ### 5. Start the development server
@@ -81,6 +107,7 @@ bin/bundler-audit
 
 ### Database Management
 
+**Development/Test:**
 ```bash
 # Create a new migration
 bin/rails generate migration MigrationName
@@ -93,7 +120,23 @@ bin/rails db:rollback
 
 # Reset database (WARNING: deletes all data)
 bin/rails db:reset
+
+# Prepare test database
+bin/rails db:test:prepare
 ```
+
+**Production:**
+```bash
+# Run migrations in production
+RAILS_ENV=production bin/rails db:migrate
+
+# Or if using environment variables
+bin/rails db:migrate RAILS_ENV=production
+```
+
+**Database Strategy:**
+- **Development/Test**: Uses SQLite3 (lightweight, no setup required)
+- **Production**: Uses PostgreSQL (configured via environment variables)
 
 ## Technology Stack
 
@@ -144,13 +187,48 @@ Uses SQLite3 for database. No additional configuration needed.
 
 ### Production
 
-Set the following environment variables:
+Create a `.env` file (or set environment variables) with the following:
 
-- `DATABASE_URL`: PostgreSQL connection string
-- `RAILS_MASTER_KEY`: Rails encrypted credentials key
-- `SECRET_KEY_BASE`: Rails secret key base
+**Required Variables:**
+```bash
+# Database Configuration
+# Option 1: Use DATABASE_URL (recommended)
+DATABASE_URL=postgresql://username:password@hostname:port/database_name
 
-See `.env.example` for a template of production environment variables.
+# Option 2: Use individual parameters
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_NAME=learnexis_production
+
+# Rails Configuration
+RAILS_ENV=production
+RAILS_MASTER_KEY=your_master_key_here
+SECRET_KEY_BASE=your_secret_key_base_here
+RAILS_MAX_THREADS=5
+```
+
+**Optional Variables (for Solid Cache, Queue, Cable):**
+```bash
+# Separate databases for Solid Stack components (optional)
+DB_CACHE_NAME=learnexis_production_cache
+DB_QUEUE_NAME=learnexis_production_queue
+DB_CABLE_NAME=learnexis_production_cable
+
+# Or use separate URLs
+DATABASE_CACHE_URL=postgresql://username:password@hostname:port/cache_db
+DATABASE_QUEUE_URL=postgresql://username:password@hostname:port/queue_db
+DATABASE_CABLE_URL=postgresql://username:password@hostname:port/cable_db
+```
+
+**Future Integration Variables (when implemented):**
+- SMS (Africastalking): `AFRICASTALKING_API_KEY`, `AFRICASTALKING_USERNAME`
+- M-Pesa: `MPESA_CONSUMER_KEY`, `MPESA_CONSUMER_SECRET`, `MPESA_SHORTCODE`, `MPESA_PASSKEY`
+- Active Storage (S3): `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_S3_BUCKET`
+- Email (SMTP): `SMTP_ADDRESS`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`
+
+**Important:** Never commit `.env` files to version control. Use your deployment platform's environment variable configuration instead.
 
 ## Contributing
 
