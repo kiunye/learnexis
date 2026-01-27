@@ -1,0 +1,18 @@
+<% content_for :title, "Edit #{@student.full_name}" %>
+
+<div>
+  <%# Page Header %>
+  <div class="mb-6">
+    <div class="breadcrumbs text-sm mb-2">
+      <ul>
+        <li><%= link_to "Students", students_path, class: "text-blue-600 hover:text-blue-700" %></li>
+        <li><%= link_to @student.full_name, student_path(@student), class: "text-blue-600 hover:text-blue-700" %></li>
+        <li>Edit</li>
+      </ul>
+    </div>
+    <h1 class="text-3xl font-bold text-gray-900">Edit Student</h1>
+    <p class="text-gray-600 mt-1">Update student information</p>
+  </div>
+
+  <%= render "form" %>
+</div>

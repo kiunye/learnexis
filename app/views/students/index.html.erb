@@ -1,0 +1,133 @@
+<% content_for :title, "Students" %>
+
+<div>
+  <%# Page Header %>
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Students</h1>
+      <p class="text-gray-600 mt-1">Manage student records and admissions</p>
+    </div>
+    <% if policy(Student).create? %>
+      <%= link_to new_student_path, class: "btn btn-primary" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        New Student
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Search and Filters %>
+  <%= turbo_frame_tag "students_filters" do %>
+    <div class="card bg-white shadow-md mb-6">
+      <div class="card-body">
+        <%= form_with url: students_path, method: :get, local: false, data: { turbo_frame: "students_list" }, class: "space-y-4" do |f| %>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <%# Search %>
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-gray-700">Search</span>
+              </label>
+              <%= f.text_field :search, 
+                  value: params[:search], 
+                  placeholder: "Name or admission number...",
+                  class: "input input-bordered w-full",
+                  data: { controller: "search", action: "input->search#submit" } %>
+            </div>
+
+            <%# Status Filter %>
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-gray-700">Status</span>
+              </label>
+              <%= f.select :status,
+                  options_for_select([
+                    ["All", ""],
+                    ["Active", "active"],
+                    ["Inactive", "inactive"],
+                    ["Graduated", "graduated"],
+                    ["Transferred", "transferred"]
+                  ], params[:status]),
+                  {},
+                  { class: "select select-bordered w-full", data: { action: "change->search#submit" } } %>
+            </div>
+
+            <%# Classroom Filter %>
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-gray-700">Classroom</span>
+              </label>
+              <%= f.select :classroom_id,
+                  options_from_collection_for_select(Classroom.order(:grade_level, :section), :id, :name, params[:classroom_id]),
+                  { include_blank: "All" },
+                  { class: "select select-bordered w-full", data: { action: "change->search#submit" } } %>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <%= f.submit "Filter", class: "btn btn-primary" %>
+            <%= link_to "Clear", students_path, class: "btn btn-ghost" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Students Table %>
+  <%= turbo_frame_tag "students_list" do %>
+    <div class="card bg-white shadow-md">
+      <div class="card-body">
+        <div class="overflow-x-auto">
+          <table class="table table-zebra w-full">
+            <thead>
+              <tr>
+                <th class="text-gray-900">Admission #</th>
+                <th class="text-gray-900">Name</th>
+                <th class="text-gray-900">Classroom</th>
+                <th class="text-gray-900">Status</th>
+                <th class="text-gray-900">Admission Date</th>
+                <th class="text-gray-900">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if @students.any? %>
+                <%= render partial: "student_row", collection: @students, as: :student %>
+              <% else %>
+                <tr>
+                  <td colspan="6" class="text-center text-gray-700 py-8">
+                    No students found.
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <%# Pagination %>
+        <% if @pagy && @pagy.pages > 1 %>
+          <div class="mt-6 flex justify-center">
+            <div class="join">
+              <% if @pagy.prev %>
+                <%= link_to "«", students_path(page: @pagy.prev, search: params[:search], status: params[:status], classroom_id: params[:classroom_id]), class: "join-item btn" %>
+              <% else %>
+                <button class="join-item btn btn-disabled">«</button>
+              <% end %>
+              <% @pagy.series.each do |item| %>
+                <% if item.is_a?(Integer) %>
+                  <%= link_to item, students_path(page: item, search: params[:search], status: params[:status], classroom_id: params[:classroom_id]), class: "join-item btn #{'btn-active' if item == @pagy.page}" %>
+                <% elsif item == :gap %>
+                  <button class="join-item btn btn-disabled">...</button>
+                <% end %>
+              <% end %>
+              <% if @pagy.next %>
+                <%= link_to "»", students_path(page: @pagy.next, search: params[:search], status: params[:status], classroom_id: params[:classroom_id]), class: "join-item btn" %>
+              <% else %>
+                <button class="join-item btn btn-disabled">»</button>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

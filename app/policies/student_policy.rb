@@ -31,11 +31,20 @@ class StudentPolicy < ApplicationPolicy
       if user.admin?
         scope.all
       elsif user.teacher?
-        # Teachers see students in their classrooms (to be implemented when models exist)
-        scope.all
+        # Teachers see students in their classrooms
+        if user.teacher_profile
+          scope.joins(:classroom).where(classrooms: { class_teacher_id: user.id })
+        else
+          scope.none
+        end
       elsif user.parent?
-        # Parents see only their children (to be implemented when models exist)
-        scope.none
+        # Parents see only their children
+        if user.parent_profile
+          scope.joins(:parent_student_relationships)
+                .where(parent_student_relationships: { parent_id: user.id })
+        else
+          scope.none
+        end
       else
         scope.none
       end
@@ -45,14 +54,12 @@ class StudentPolicy < ApplicationPolicy
   private
 
   def owns_student?
-    # Placeholder - will be implemented when ParentProfile and relationships exist
-    # user.parent? && user.parent_profile.students.include?(record)
-    false
+    user.parent? && user.parent_profile&.students&.include?(record)
   end
 
   def teaches_student?
-    # Placeholder - will be implemented when Classroom and enrollment models exist
-    # user.teacher? && record.classrooms.exists?(teacher_id: user.teacher_profile.id)
-    false
+    return false unless user.teacher? && record.classroom
+
+    record.classroom.class_teacher_id == user.id
   end
 end
