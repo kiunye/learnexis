@@ -1,0 +1,54 @@
+<% content_for :title, "Attendance - #{@classroom.name}" %>
+
+<div>
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <div class="breadcrumbs text-sm mb-2">
+        <ul>
+          <li><%= link_to "Classrooms", classrooms_path, class: "text-blue-600 hover:text-blue-700" %></li>
+          <li><%= link_to @classroom.name, classroom_path(@classroom), class: "text-blue-600 hover:text-blue-700" %></li>
+          <li>Attendance</li>
+        </ul>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-900">Attendance Register</h1>
+      <p class="text-gray-600 mt-1"><%= @classroom.name %> • <%= @date.strftime("%A, %B %d, %Y") %></p>
+    </div>
+    <div class="flex gap-2">
+      <% if policy(@classroom).update? %>
+        <%= link_to mark_classroom_attendances_path(@classroom, date: @date), class: "btn btn-primary" do %>
+          Mark Attendance
+        <% end %>
+      <% end %>
+      <%= link_to reports_classroom_attendances_path(@classroom), class: "btn btn-ghost" do %>
+        Reports
+      <% end %>
+      <%= link_to classroom_path(@classroom), class: "btn btn-ghost" do %>
+        Back to Classroom
+      <% end %>
+    </div>
+  </div>
+
+  <%# Date selector %>
+  <%= form_with url: classroom_attendances_path(@classroom), method: :get, local: true, class: "mb-6" do |f| %>
+    <div class="flex gap-2 items-end">
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text text-gray-700">Date</span>
+        </label>
+        <%= f.date_field :date, value: @date, max: Date.current, class: "input input-bordered" %>
+      </div>
+      <%= f.submit "Go", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+
+  <%= turbo_frame_tag "attendance_register" do %>
+    <div class="card bg-white shadow-md">
+      <div class="card-body">
+        <%= render partial: "classrooms/attendances/register_table", locals: { classroom: @classroom, date: @date, students: @students, attendances_by_student: @attendances_by_student } %>
+        <% if @students.empty? %>
+          <p class="text-center text-gray-700 py-8">No students in this classroom.</p>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -250,7 +250,7 @@
 
   <%# Form Actions %>
   <div class="flex justify-end gap-3">
-    <%= link_to "Cancel", @student ? student_path(@student) : students_path, class: "btn btn-ghost" %>
+    <%= link_to "Cancel", @student ? student_path(@student) : students_path, class: "btn btn-ghost", data: { turbo_frame: "_top" } %>
     <%= f.submit @student ? "Update Student" : "Create Student", class: "btn btn-primary" %>
   </div>
 <% end %>

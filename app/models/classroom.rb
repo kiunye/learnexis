@@ -1,6 +1,7 @@
 class Classroom < ApplicationRecord
   belongs_to :class_teacher, class_name: "User", optional: true
   has_many :students, dependent: :nullify
+  has_many :attendances, dependent: :destroy
 
   validates :name, presence: true
   validates :name, uniqueness: { scope: :academic_year, message: "must be unique within academic year" }

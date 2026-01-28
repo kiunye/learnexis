@@ -1,0 +1,97 @@
+<% content_for :title, "Mark Attendance - #{@classroom.name}" %>
+
+<div data-controller="attendance-mark">
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <div class="breadcrumbs text-sm mb-2">
+        <ul>
+          <li><%= link_to "Classrooms", classrooms_path, class: "text-blue-600 hover:text-blue-700" %></li>
+          <li><%= link_to @classroom.name, classroom_path(@classroom), class: "text-blue-600 hover:text-blue-700" %></li>
+          <li><%= link_to "Attendance", classroom_attendances_path(@classroom), class: "text-blue-600 hover:text-blue-700" %></li>
+          <li>Mark</li>
+        </ul>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-900">Mark Attendance</h1>
+      <p class="text-gray-600 mt-1"><%= @classroom.name %> • <%= @date.strftime("%A, %B %d, %Y") %></p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to classroom_attendances_path(@classroom, date: @date), class: "btn btn-ghost" do %>
+        View Register
+      <% end %>
+      <%= link_to classroom_path(@classroom), class: "btn btn-ghost" do %>
+        Back to Classroom
+      <% end %>
+    </div>
+  </div>
+
+  <%# Quick actions %>
+  <div class="card bg-white shadow-md mb-6">
+    <div class="card-body">
+      <h2 class="card-title text-lg text-gray-900 mb-2">Quick Actions</h2>
+      <div class="flex flex-wrap gap-2 join">
+        <button type="button" data-action="click->attendance-mark#markAllPresent" class="btn btn-success join-item">
+          Mark All Present
+        </button>
+        <button type="button" data-action="click->attendance-mark#markAllAbsent" class="btn btn-error join-item">
+          Mark All Absent
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <%= form_with url: classroom_attendances_path(@classroom), method: :patch, data: { controller: "attendance-mark" }, id: "attendance_form" do |f| %>
+    <%= hidden_field_tag :date, @date %>
+    <%= turbo_frame_tag "attendance_register" do %>
+      <div class="card bg-white shadow-md">
+        <div class="card-body">
+          <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+              <thead>
+                <tr>
+                  <th class="text-gray-900">Student</th>
+                  <th class="text-gray-900">Admission #</th>
+                  <th class="text-gray-900">Status</th>
+                  <th class="text-gray-900">Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @students.each_with_index do |student, idx| %>
+                  <% attendance = @attendances_by_student[student.id] %>
+                  <tr>
+                    <td>
+                      <div class="font-medium text-gray-900"><%= student.full_name %></div>
+                      <div class="text-sm text-gray-600"><%= student.user.email_address %></div>
+                    </td>
+                    <td><span class="text-gray-700 font-mono text-sm"><%= student.admission_number %></span></td>
+                    <td>
+                      <div data-attendance-mark-target="row">
+                        <%= hidden_field_tag "attendances[#{idx}][student_id]", student.id %>
+                        <%= select_tag "attendances[#{idx}][status]",
+                            options_for_select(
+                              [["Present", "present"], ["Absent", "absent"], ["Late", "late"], ["Excused", "excused"]],
+                              attendance&.status || "present"
+                            ),
+                            class: "select select-bordered select-sm w-full max-w-[120px]",
+                            data: { attendance_mark_target: "statusSelect" } %>
+                      </div>
+                    </td>
+                    <td>
+                      <%= text_field_tag "attendances[#{idx}][remarks]", attendance&.remarks, class: "input input-bordered input-sm w-full max-w-xs", placeholder: "Optional" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+          <% if @students.empty? %>
+            <p class="text-center text-gray-700 py-8">No students in this classroom.</p>
+          <% else %>
+            <div class="mt-6">
+              <%= submit_tag "Save Attendance", class: "btn btn-primary" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>

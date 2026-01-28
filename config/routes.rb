@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
 
-  # Dashboard (role-based, will be implemented in Task 6)
+  # Dashboard (role-based)
   get "dashboard", to: "dashboards#show", as: :dashboard
 
   # Students
@@ -16,6 +16,13 @@ Rails.application.routes.draw do
     member do
       get :enroll_students
       patch :update_enrollment
+    end
+    resources :attendances, only: %i[index], controller: "classrooms/attendances" do
+      collection do
+        get :mark
+        get :reports
+        patch :update
+      end
     end
   end
 

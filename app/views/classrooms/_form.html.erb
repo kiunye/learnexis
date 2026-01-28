@@ -103,7 +103,7 @@
 
   <%# Form Actions %>
   <div class="flex justify-end gap-3">
-    <%= link_to "Cancel", @classroom.persisted? ? classroom_path(@classroom) : classrooms_path, class: "btn btn-ghost" %>
+    <%= link_to "Cancel", @classroom.persisted? ? classroom_path(@classroom) : classrooms_path, class: "btn btn-ghost", data: { turbo_frame: "_top" } %>
     <%= f.submit @classroom.persisted? ? "Update Classroom" : "Create Classroom", class: "btn btn-primary" %>
   </div>
 <% end %>

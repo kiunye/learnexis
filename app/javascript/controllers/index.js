@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import AttendanceMarkController from "./attendance_mark_controller"
+application.register("attendance-mark", AttendanceMarkController)
+
 import DropdownController from "./dropdown_controller"
 application.register("dropdown", DropdownController)
 

@@ -3,6 +3,7 @@ class Student < ApplicationRecord
   belongs_to :classroom, optional: true
   has_many :parent_student_relationships, dependent: :destroy
   has_many :parents, through: :parent_student_relationships, source: :parent
+  has_many :attendances, dependent: :destroy
 
   has_one_attached :photo
 
