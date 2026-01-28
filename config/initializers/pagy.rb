@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Pagy initializer for Pagy 43.2.8
-require 'pagy'
+require "pagy"
 
 # Configure global defaults using Pagy.options (replaces Pagy::DEFAULT in v43)
 # See https://ddnexus.github.io/pagy/how-to for available options

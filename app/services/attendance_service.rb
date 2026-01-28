@@ -50,7 +50,7 @@ class AttendanceService
     records = Attendance.where(student: student, attendance_date: date_range)
     return nil if records.empty?
 
-    present_count = records.where(status: [:present, :late]).count
+    present_count = records.where(status: [ :present, :late ]).count
     (present_count.to_f / records.count * 100).round(1)
   end
 

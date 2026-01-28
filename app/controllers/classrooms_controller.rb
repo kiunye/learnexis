@@ -1,6 +1,4 @@
 class ClassroomsController < ApplicationController
- 
-
   before_action :set_classroom, only: %i[show edit update destroy enroll_students update_enrollment]
   before_action :authorize_classroom, only: %i[show edit update destroy enroll_students update_enrollment]
 

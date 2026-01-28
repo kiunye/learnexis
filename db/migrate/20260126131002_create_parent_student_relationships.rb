@@ -8,6 +8,6 @@ class CreateParentStudentRelationships < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :parent_student_relationships, [:parent_id, :student_id], unique: true, name: "index_parent_student_relationships_on_parent_and_student"
+    add_index :parent_student_relationships, [ :parent_id, :student_id ], unique: true, name: "index_parent_student_relationships_on_parent_and_student"
   end
 end

@@ -23,6 +23,6 @@ class Student < ApplicationRecord
   scope :in_grade, ->(grade) { joins(:classroom).where(classrooms: { grade_level: grade }) }
 
   def full_name
-    [user.first_name, user.last_name].compact.join(" ").presence || user.email_address
+    [ user.first_name, user.last_name ].compact.join(" ").presence || user.email_address
   end
 end

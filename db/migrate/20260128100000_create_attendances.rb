@@ -12,8 +12,8 @@ class CreateAttendances < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :attendances, [:student_id, :attendance_date], unique: true
-    add_index :attendances, [:classroom_id, :attendance_date]
+    add_index :attendances, [ :student_id, :attendance_date ], unique: true
+    add_index :attendances, [ :classroom_id, :attendance_date ]
     add_index :attendances, :attendance_date
   end
 end

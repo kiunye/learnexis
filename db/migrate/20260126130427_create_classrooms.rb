@@ -12,7 +12,7 @@ class CreateClassrooms < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :classrooms, [:name, :academic_year], unique: true
+    add_index :classrooms, [ :name, :academic_year ], unique: true
     add_index :classrooms, :grade_level
   end
 end

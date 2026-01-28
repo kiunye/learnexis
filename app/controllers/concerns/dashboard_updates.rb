@@ -24,7 +24,7 @@ module DashboardUpdates
   # Broadcast dashboard update to refresh all widgets for a user
   # This will be called from controllers when significant data changes
   def broadcast_dashboard_refresh(user_ids: nil)
-    user_ids ||= [Current.user&.id].compact
+    user_ids ||= [ Current.user&.id ].compact
 
     user_ids.each do |user_id|
       # Clear cache first
