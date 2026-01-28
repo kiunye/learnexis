@@ -7,13 +7,13 @@ one:
   academic_year: 1
   capacity: 1
   room_number: MyString
-  teacher_id: 1
+  class_teacher: one
 
 two:
-  name: MyString
+  name: OtherString
   grade_level: 1
   section: MyString
-  academic_year: 1
+  academic_year: 2
   capacity: 1
   room_number: MyString
-  teacher_id: 1
+  class_teacher: one

@@ -8,8 +8,8 @@ module ActiveSupport
     # Run tests in parallel with specified workers
     parallelize(workers: :number_of_processors)
 
-    # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
-    fixtures :all
+    # Setup all fixtures in dependency order so foreign keys resolve (users → classrooms → students).
+    fixtures :users, :classrooms, :students
 
     # Add more helper methods to be used by all tests here...
   end

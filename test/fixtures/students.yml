@@ -15,7 +15,7 @@ one:
   classroom: one
 
 two:
-  admission_number: MyString
+  admission_number: OtherString
   date_of_birth: 2026-01-26
   admission_date: 2026-01-26
   status: 1
