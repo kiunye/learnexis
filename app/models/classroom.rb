@@ -8,6 +8,14 @@ class Classroom < ApplicationRecord
   validates :capacity, presence: true, numericality: { greater_than: 0 }
   validates :academic_year, presence: true
 
+  validate :capacity_not_exceeded, on: :update
+
+  def capacity_not_exceeded
+    if students.count > capacity
+      errors.add(:capacity, "cannot be less than current student count (#{students.count})")
+    end
+  end
+
   scope :for_academic_year, ->(year) { where(academic_year: year) }
   scope :by_grade_level, ->(grade) { where(grade_level: grade) }
 

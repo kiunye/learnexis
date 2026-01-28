@@ -1,0 +1,80 @@
+<%= turbo_frame_tag "enrollment_modal" do %>
+  <dialog id="enrollment_modal" class="modal modal-open">
+    <div class="modal-box w-11/12 max-w-3xl">
+      <h3 class="font-bold text-lg text-gray-100 mb-4">Enroll Students in <%= @classroom.name %></h3>
+      
+      <%# Capacity Warning %>
+      <% if @classroom.full? %>
+        <div class="alert alert-error mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>This classroom is full. Cannot enroll more students.</span>
+        </div>
+      <% else %>
+        <div class="alert alert-info mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>
+            Available spots: <strong><%= @classroom.capacity - @classroom.current_students_count %></strong>
+            (<%= @classroom.current_students_count %> / <%= @classroom.capacity %> enrolled)
+          </span>
+        </div>
+      <% end %>
+
+      <%= form_with url: update_enrollment_classroom_path(@classroom), method: :patch, local: true, class: "space-y-4" do |f| %>
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text text-gray-300 font-medium">Select Students to Enroll</span>
+          </label>
+          <div class="max-h-96 overflow-y-auto border border-gray-700 rounded-lg p-4 space-y-2">
+            <% if @available_students.any? %>
+              <% @available_students.each do |student| %>
+                <label class="flex items-center gap-3 cursor-pointer hover:bg-gray-700 p-2 rounded">
+                  <%= check_box_tag "student_ids[]",
+                      student.id,
+                      false,
+                      class: "checkbox checkbox-primary",
+                      disabled: @classroom.full? %>
+                  <div class="flex items-center gap-3 flex-1">
+                    <% if student.photo.attached? %>
+                      <%= image_tag student.photo, class: "w-8 h-8 rounded-full object-cover" %>
+                    <% else %>
+                      <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                        <span class="text-gray-300 text-xs font-medium"><%= student.user.first_name&.first&.upcase || "?" %></span>
+                      </div>
+                    <% end %>
+                    <div class="flex-1">
+                      <p class="font-medium text-gray-100"><%= student.full_name %></p>
+                      <p class="text-sm text-gray-600">
+                        <%= student.admission_number %>
+                        <% if student.classroom %>
+                          • Currently in <%= student.classroom.name %>
+                        <% else %>
+                          • Not assigned
+                        <% end %>
+                      </p>
+                    </div>
+                  </div>
+                </label>
+              <% end %>
+            <% else %>
+              <p class="text-gray-600 text-center py-4">No available students to enroll.</p>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="modal-action">
+          <button type="button" onclick="document.getElementById('enrollment_modal').close()" class="btn btn-ghost">Cancel</button>
+          <%= f.submit "Enroll Selected Students", 
+              class: "btn btn-primary",
+              disabled: @classroom.full? %>
+        </div>
+      <% end %>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
+  </dialog>
+<% end %>

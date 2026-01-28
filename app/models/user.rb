@@ -45,4 +45,13 @@ class User < ApplicationRecord
   def student?
     role == "student"
   end
+
+  def full_name
+    [first_name, last_name].compact.join(" ").presence || email_address
+  end
+
+  def full_name_with_email
+    name = full_name
+    name == email_address ? email_address : "#{name} (#{email_address})"
+  end
 end

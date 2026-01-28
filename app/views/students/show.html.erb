@@ -10,7 +10,7 @@
           <li><%= @student.full_name %></li>
         </ul>
       </div>
-      <h1 class="text-3xl font-bold text-gray-900"><%= @student.full_name %></h1>
+      <h1 class="text-3xl font-bold text-gray-100"><%= @student.full_name %></h1>
       <p class="text-gray-600 mt-1">Admission #<%= @student.admission_number %></p>
     </div>
     <div class="flex gap-2">
@@ -32,43 +32,43 @@
     <%# Main Info Card %>
     <div class="lg:col-span-2 space-y-6">
       <%# Personal Information %>
-      <div class="card bg-white shadow-md">
+      <div class="card bg-gray-800 border border-gray-700 shadow-md">
         <div class="card-body">
-          <h2 class="card-title text-xl mb-4 text-gray-900">Personal Information</h2>
+          <h2 class="card-title text-xl mb-4 text-gray-100">Personal Information</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="label">
-                <span class="label-text font-medium text-gray-700">Full Name</span>
+                <span class="label-text font-medium text-gray-300">Full Name</span>
               </label>
-              <p class="text-gray-700"><%= @student.full_name %></p>
+              <p class="text-gray-300"><%= @student.full_name %></p>
             </div>
             <div>
               <label class="label">
-                <span class="label-text font-medium text-gray-700">Email</span>
+                <span class="label-text font-medium text-gray-300">Email</span>
               </label>
-              <p class="text-gray-700"><%= @student.user.email_address %></p>
+              <p class="text-gray-300"><%= @student.user.email_address %></p>
             </div>
             <div>
               <label class="label">
-                <span class="label-text font-medium text-gray-700">Phone Number</span>
+                <span class="label-text font-medium text-gray-300">Phone Number</span>
               </label>
-              <p class="text-gray-700"><%= @student.user.phone_number || "—" %></p>
+              <p class="text-gray-300"><%= @student.user.phone_number || "—" %></p>
             </div>
             <div>
               <label class="label">
-                <span class="label-text font-medium text-gray-700">Date of Birth</span>
+                <span class="label-text font-medium text-gray-300">Date of Birth</span>
               </label>
-              <p class="text-gray-700"><%= @student.date_of_birth&.strftime("%B %d, %Y") || "—" %></p>
+              <p class="text-gray-300"><%= @student.date_of_birth&.strftime("%B %d, %Y") || "—" %></p>
             </div>
             <div>
               <label class="label">
-                <span class="label-text font-medium text-gray-700">Blood Group</span>
+                <span class="label-text font-medium text-gray-300">Blood Group</span>
               </label>
-              <p class="text-gray-700"><%= @student.blood_group || "—" %></p>
+              <p class="text-gray-300"><%= @student.blood_group || "—" %></p>
             </div>
             <div>
               <label class="label">
-                <span class="label-text font-medium text-gray-700">Status</span>
+                <span class="label-text font-medium text-gray-300">Status</span>
               </label>
               <p>
                 <% case @student.status %>
@@ -88,17 +88,17 @@
       </div>
 
       <%# Academic Information %>
-      <div class="card bg-white shadow-md">
+      <div class="card bg-gray-800 border border-gray-700 shadow-md">
         <div class="card-body">
-          <h2 class="card-title text-xl mb-4 text-gray-900">Academic Information</h2>
+          <h2 class="card-title text-xl mb-4 text-gray-100">Academic Information</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="label">
-                <span class="label-text font-medium text-gray-700">Classroom</span>
+                <span class="label-text font-medium text-gray-300">Classroom</span>
               </label>
-              <p class="text-gray-700">
+              <p class="text-gray-300">
                 <% if @student.classroom %>
-                  <span class="badge badge-outline text-gray-900"><%= @student.classroom.name %></span>
+                  <span class="badge badge-outline text-gray-100"><%= @student.classroom.name %></span>
                 <% else %>
                   <span class="text-gray-600">Not assigned</span>
                 <% end %>
@@ -106,9 +106,9 @@
             </div>
             <div>
               <label class="label">
-                <span class="label-text font-medium text-gray-700">Admission Date</span>
+                <span class="label-text font-medium text-gray-300">Admission Date</span>
               </label>
-              <p class="text-gray-700"><%= @student.admission_date&.strftime("%B %d, %Y") || "—" %></p>
+              <p class="text-gray-300"><%= @student.admission_date&.strftime("%B %d, %Y") || "—" %></p>
             </div>
           </div>
         </div>
@@ -116,32 +116,32 @@
 
       <%# Medical & Special Needs %>
       <% if @student.medical_conditions.present? || @student.allergies.present? || @student.special_needs.present? %>
-        <div class="card bg-white shadow-md">
+        <div class="card bg-gray-800 border border-gray-700 shadow-md">
           <div class="card-body">
-            <h2 class="card-title text-xl mb-4 text-gray-900">Medical & Special Needs</h2>
+            <h2 class="card-title text-xl mb-4 text-gray-100">Medical & Special Needs</h2>
             <div class="space-y-4">
               <% if @student.medical_conditions.present? %>
                 <div>
                     <label class="label">
-                      <span class="label-text font-medium text-gray-700">Medical Conditions</span>
+                      <span class="label-text font-medium text-gray-300">Medical Conditions</span>
                     </label>
-                  <p class="text-gray-700"><%= @student.medical_conditions %></p>
+                  <p class="text-gray-300"><%= @student.medical_conditions %></p>
                 </div>
               <% end %>
               <% if @student.allergies.present? %>
                 <div>
                     <label class="label">
-                      <span class="label-text font-medium text-gray-700">Allergies</span>
+                      <span class="label-text font-medium text-gray-300">Allergies</span>
                     </label>
-                  <p class="text-gray-700"><%= @student.allergies %></p>
+                  <p class="text-gray-300"><%= @student.allergies %></p>
                 </div>
               <% end %>
               <% if @student.special_needs.present? %>
                 <div>
                     <label class="label">
-                      <span class="label-text font-medium text-gray-700">Special Needs</span>
+                      <span class="label-text font-medium text-gray-300">Special Needs</span>
                     </label>
-                  <p class="text-gray-700"><%= @student.special_needs %></p>
+                  <p class="text-gray-300"><%= @student.special_needs %></p>
                 </div>
               <% end %>
             </div>
@@ -150,21 +150,21 @@
       <% end %>
 
       <%# Emergency Contact %>
-      <div class="card bg-white shadow-md">
+      <div class="card bg-gray-800 border border-gray-700 shadow-md">
         <div class="card-body">
-          <h2 class="card-title text-xl mb-4 text-gray-900">Emergency Contact</h2>
+          <h2 class="card-title text-xl mb-4 text-gray-100">Emergency Contact</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="label">
-                <span class="label-text font-medium text-gray-700">Contact Name</span>
+                <span class="label-text font-medium text-gray-300">Contact Name</span>
               </label>
-              <p class="text-gray-700"><%= @student.emergency_contact_name || "—" %></p>
+              <p class="text-gray-300"><%= @student.emergency_contact_name || "—" %></p>
             </div>
             <div>
               <label class="label">
-                <span class="label-text font-medium text-gray-700">Contact Phone</span>
+                <span class="label-text font-medium text-gray-300">Contact Phone</span>
               </label>
-              <p class="text-gray-700"><%= @student.emergency_contact_phone || "—" %></p>
+              <p class="text-gray-300"><%= @student.emergency_contact_phone || "—" %></p>
             </div>
           </div>
         </div>
@@ -174,9 +174,9 @@
     <%# Sidebar %>
     <div class="space-y-6">
       <%# Photo Card %>
-      <div class="card bg-white shadow-md">
+      <div class="card bg-gray-800 border border-gray-700 shadow-md">
         <div class="card-body">
-          <h2 class="card-title text-lg mb-4 text-gray-900">Photo</h2>
+          <h2 class="card-title text-lg mb-4 text-gray-100">Photo</h2>
           <div class="flex justify-center">
             <% if @student.photo.attached? %>
               <%= image_tag @student.photo, class: "w-48 h-48 rounded-lg object-cover" %>
@@ -191,14 +191,14 @@
 
       <%# Parents Card %>
       <% if @student.parents.any? %>
-        <div class="card bg-white shadow-md">
+        <div class="card bg-gray-800 border border-gray-700 shadow-md">
           <div class="card-body">
-            <h2 class="card-title text-lg mb-4 text-gray-900">Parents/Guardians</h2>
+            <h2 class="card-title text-lg mb-4 text-gray-100">Parents/Guardians</h2>
             <div class="space-y-3">
               <% @student.parents.each do |parent| %>
-                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
                   <div class="flex-1">
-                    <p class="font-medium text-gray-900"><%= "#{parent.first_name} #{parent.last_name}" %></p>
+                    <p class="font-medium text-gray-100"><%= "#{parent.first_name} #{parent.last_name}" %></p>
                     <p class="text-sm text-gray-600"><%= parent.email_address %></p>
                     <% if parent.phone_number.present? %>
                       <p class="text-sm text-gray-600"><%= parent.phone_number %></p>

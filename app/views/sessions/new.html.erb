@@ -1,12 +1,12 @@
-<div class="hero min-h-screen bg-base-200">
+<div class="hero min-h-screen bg-gray-950">
   <div class="hero-content flex-col lg:flex-row-reverse">
     <div class="text-center lg:text-left">
-      <h1 class="text-5xl font-bold">LearnExis</h1>
-      <p class="py-6">School Management System</p>
+      <h1 class="text-5xl font-bold text-gray-100">LearnExis</h1>
+      <p class="py-6 text-gray-400">School Management System</p>
     </div>
-    <div class="card bg-base-100 w-full max-w-sm shadow-2xl">
+    <div class="card bg-gray-800 border border-gray-700 w-full max-w-sm shadow-2xl">
       <div class="card-body">
-        <h2 class="card-title text-2xl mb-4">Sign in</h2>
+        <h2 class="card-title text-2xl mb-4 text-gray-100">Sign in</h2>
 
         <% if alert = flash[:alert] %>
           <div class="alert alert-error mb-4" id="alert">
@@ -28,24 +28,24 @@
 
         <%= form_with url: session_url, class: "space-y-4" do |form| %>
           <div class="form-control">
-            <%= form.label :email_address, "Email address", class: "label" %>
+            <%= form.label :email_address, "Email address", class: "label text-gray-300" %>
             <%= form.email_field :email_address, 
                 required: true, 
                 autofocus: true, 
                 autocomplete: "username", 
                 placeholder: "Enter your email address", 
                 value: params[:email_address], 
-                class: "input input-bordered w-full" %>
+                class: "input input-bordered w-full bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500" %>
           </div>
 
           <div class="form-control">
-            <%= form.label :password, "Password", class: "label" %>
+            <%= form.label :password, "Password", class: "label text-gray-300" %>
             <%= form.password_field :password, 
                 required: true, 
                 autocomplete: "current-password", 
                 placeholder: "Enter your password", 
                 maxlength: 72, 
-                class: "input input-bordered w-full" %>
+                class: "input input-bordered w-full bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500" %>
           </div>
 
           <div class="form-control mt-6">
@@ -53,7 +53,7 @@
           </div>
 
           <div class="text-center mt-4">
-            <%= link_to "Forgot password?", new_password_path, class: "link link-hover text-sm" %>
+            <%= link_to "Forgot password?", new_password_path, class: "link link-hover text-sm text-blue-400 hover:text-blue-300" %>
           </div>
         <% end %>
       </div>

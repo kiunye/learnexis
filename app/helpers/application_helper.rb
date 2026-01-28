@@ -3,13 +3,13 @@ module ApplicationHelper
   def flash_class(type)
     case type.to_s
     when "notice", "success"
-      "bg-green-50 border border-green-200 text-green-800"
+      "bg-green-900/90 border border-green-700 text-green-100"
     when "alert", "error"
-      "bg-red-50 border border-red-200 text-red-800"
+      "bg-red-900/90 border border-red-700 text-red-100"
     when "warning"
-      "bg-yellow-50 border border-yellow-200 text-yellow-800"
+      "bg-yellow-900/90 border border-yellow-700 text-yellow-100"
     else
-      "bg-blue-50 border border-blue-200 text-blue-800"
+      "bg-blue-900/90 border border-blue-700 text-blue-100"
     end
   end
 end

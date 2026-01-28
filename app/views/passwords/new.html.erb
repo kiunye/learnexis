@@ -1,8 +1,8 @@
-<div class="hero min-h-screen bg-base-200">
+<div class="hero min-h-screen bg-gray-950">
   <div class="hero-content flex-col">
-    <div class="card bg-base-100 w-full max-w-md shadow-2xl">
+    <div class="card bg-gray-800 border border-gray-700 w-full max-w-md shadow-2xl">
       <div class="card-body">
-        <h1 class="card-title text-2xl mb-4">Forgot your password?</h1>
+        <h1 class="card-title text-2xl mb-4 text-gray-100">Forgot your password?</h1>
 
         <% if alert = flash[:alert] %>
           <div class="alert alert-error mb-4" id="alert">
@@ -15,14 +15,14 @@
 
         <%= form_with url: passwords_path, class: "space-y-4" do |form| %>
           <div class="form-control">
-            <%= form.label :email_address, "Email address", class: "label" %>
+            <%= form.label :email_address, "Email address", class: "label text-gray-300" %>
             <%= form.email_field :email_address, 
                 required: true, 
                 autofocus: true, 
                 autocomplete: "username", 
                 placeholder: "Enter your email address", 
                 value: params[:email_address], 
-                class: "input input-bordered w-full" %>
+                class: "input input-bordered w-full bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500" %>
           </div>
 
           <div class="form-control mt-6">
@@ -30,7 +30,7 @@
           </div>
 
           <div class="text-center mt-4">
-            <%= link_to "Back to sign in", new_session_path, class: "link link-hover text-sm" %>
+            <%= link_to "Back to sign in", new_session_path, class: "link link-hover text-sm text-blue-400 hover:text-blue-300" %>
           </div>
         <% end %>
       </div>

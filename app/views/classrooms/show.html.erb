@@ -1,0 +1,192 @@
+<% content_for :title, @classroom.name %>
+
+<div>
+  <%# Page Header %>
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <div class="breadcrumbs text-sm mb-2">
+        <ul>
+          <li><%= link_to "Classrooms", classrooms_path, class: "text-blue-600 hover:text-blue-700" %></li>
+          <li><%= @classroom.name %></li>
+        </ul>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-100"><%= @classroom.name %></h1>
+      <p class="text-gray-600 mt-1">Grade <%= @classroom.grade_level %> • Academic Year <%= @classroom.academic_year %></p>
+    </div>
+    <div class="flex gap-2">
+      <% if policy(@classroom).update? %>
+        <%= link_to edit_classroom_path(@classroom), class: "btn btn-primary" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          Edit
+        <% end %>
+      <% end %>
+      <% if policy(@classroom).update? %>
+        <%= link_to enroll_students_classroom_path(@classroom), 
+            class: "btn btn-secondary", 
+            data: { turbo_frame: "enrollment_modal" },
+            onclick: "document.getElementById('enrollment_modal').showModal(); return false;" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Enroll Students
+        <% end %>
+      <% end %>
+      <%= link_to classrooms_path, class: "btn btn-ghost" do %>
+        Back to List
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <%# Main Content %>
+    <div class="lg:col-span-2 space-y-6">
+      <%# Classroom Information %>
+      <div class="card bg-gray-800 border border-gray-700 shadow-md">
+        <div class="card-body">
+          <h2 class="card-title text-xl mb-4 text-gray-100">Classroom Information</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="label">
+                <span class="label-text font-medium text-gray-300">Classroom Name</span>
+              </label>
+              <p class="text-gray-300"><%= @classroom.name %></p>
+            </div>
+            <div>
+              <label class="label">
+                <span class="label-text font-medium text-gray-300">Grade Level</span>
+              </label>
+              <p class="text-gray-300">Grade <%= @classroom.grade_level %></p>
+            </div>
+            <div>
+              <label class="label">
+                <span class="label-text font-medium text-gray-300">Section</span>
+              </label>
+              <p class="text-gray-300"><%= @classroom.section %></p>
+            </div>
+            <div>
+              <label class="label">
+                <span class="label-text font-medium text-gray-300">Room Number</span>
+              </label>
+              <p class="text-gray-300"><%= @classroom.room_number || "—" %></p>
+            </div>
+            <div>
+              <label class="label">
+                <span class="label-text font-medium text-gray-300">Class Teacher</span>
+              </label>
+              <p class="text-gray-300">
+                <% if @classroom.class_teacher %>
+                  <%= "#{@classroom.class_teacher.first_name} #{@classroom.class_teacher.last_name}" %>
+                <% else %>
+                  <span class="text-gray-600">Not assigned</span>
+                <% end %>
+              </p>
+            </div>
+            <div>
+              <label class="label">
+                <span class="label-text font-medium text-gray-300">Academic Year</span>
+              </label>
+              <p class="text-gray-300"><%= @classroom.academic_year %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <%# Capacity Status %>
+      <div class="card bg-gray-800 border border-gray-700 shadow-md">
+        <div class="card-body">
+          <h2 class="card-title text-xl mb-4 text-gray-100">Capacity Status</h2>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between mb-2">
+                <span class="text-gray-300 font-medium">Enrollment</span>
+                <span class="text-gray-300">
+                  <%= @classroom.current_students_count %> / <%= @classroom.capacity %>
+                </span>
+              </div>
+              <progress class="progress progress-primary w-full" 
+                        value="<%= @classroom.current_students_count %>" 
+                        max="<%= @classroom.capacity %>">
+                <%= (@classroom.current_students_count.to_f / @classroom.capacity * 100).round %>%
+              </progress>
+            </div>
+            <div class="flex gap-2">
+              <% if @classroom.full? %>
+                <span class="badge badge-error">Full</span>
+              <% elsif @classroom.current_students_count >= (@classroom.capacity * 0.9) %>
+                <span class="badge badge-warning">Nearly Full (<%= ((@classroom.capacity - @classroom.current_students_count).to_f / @classroom.capacity * 100).round %>% remaining)</span>
+              <% else %>
+                <span class="badge badge-success">Available (<%= @classroom.capacity - @classroom.current_students_count %> spots remaining)</span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <%# Students List %>
+      <%= turbo_frame_tag "classroom_students" do %>
+        <div class="card bg-gray-800 border border-gray-700 shadow-md">
+          <div class="card-body">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="card-title text-xl text-gray-100">Students (<%= @students.count %>)</h2>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="table table-zebra w-full">
+                <thead>
+                  <tr>
+                    <th class="text-gray-100">Admission #</th>
+                    <th class="text-gray-100">Name</th>
+                    <th class="text-gray-100">Status</th>
+                    <th class="text-gray-100">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if @students.any? %>
+                    <%= render partial: "student_row", collection: @students, as: :student %>
+                  <% else %>
+                    <tr>
+                      <td colspan="4" class="text-center text-gray-300 py-8">
+                        No students enrolled in this classroom.
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Sidebar Stats %>
+    <div class="space-y-6">
+      <div class="card bg-gray-800 border border-gray-700 shadow-md">
+        <div class="card-body">
+          <h2 class="card-title text-lg mb-4 text-gray-100">Quick Stats</h2>
+          <div class="stats stats-vertical shadow w-full">
+            <div class="stat">
+              <div class="stat-title text-gray-600">Total Students</div>
+              <div class="stat-value text-primary"><%= @classroom.current_students_count %></div>
+              <div class="stat-desc text-gray-600">of <%= @classroom.capacity %> capacity</div>
+            </div>
+            <div class="stat">
+              <div class="stat-title text-gray-600">Available Spots</div>
+              <div class="stat-value text-success"><%= [0, @classroom.capacity - @classroom.current_students_count].max %></div>
+              <div class="stat-desc text-gray-600">
+                <% if @classroom.full? %>
+                  Classroom is full
+                <% else %>
+                  <%= ((@classroom.capacity - @classroom.current_students_count).to_f / @classroom.capacity * 100).round %>% capacity remaining
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%# Enrollment Modal %>
+<%= turbo_frame_tag "enrollment_modal" %>

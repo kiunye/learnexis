@@ -1,21 +1,21 @@
 <%# Table Card - Recent Transactions %>
 <%= turbo_frame_tag "widget_table_recent" do %>
-  <div class="card bg-white shadow-md lg:col-span-2">
+  <div class="card bg-gray-800 border border-gray-700 shadow-md lg:col-span-2">
     <div class="card-body">
-      <h2 class="card-title text-lg font-bold text-gray-900 mb-4">Recent Transactions</h2>
+      <h2 class="card-title text-lg font-bold text-gray-100 mb-4">Recent Transactions</h2>
       <div class="overflow-x-auto">
-        <table class="table table-zebra w-full">
+        <table class="table w-full">
           <thead>
-            <tr>
-              <th>Date</th>
-              <th>Student</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Method</th>
+            <tr class="border-gray-700">
+              <th class="text-gray-300">Date</th>
+              <th class="text-gray-300">Student</th>
+              <th class="text-gray-300">Amount</th>
+              <th class="text-gray-300">Status</th>
+              <th class="text-gray-300">Method</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="border-gray-700">
               <td colspan="5" class="text-center text-gray-500 py-8">
                 No transactions yet. Transactions will appear here once payments are recorded.
               </td>
@@ -24,7 +24,7 @@
         </table>
       </div>
       <div class="mt-4">
-        <a href="#" class="text-sm text-blue-600 hover:text-blue-700 font-medium">View all transactions →</a>
+        <a href="#" class="text-sm text-blue-400 hover:text-blue-300 font-medium">View all transactions →</a>
       </div>
     </div>
   </div>

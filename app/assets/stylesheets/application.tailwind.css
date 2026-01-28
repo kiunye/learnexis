@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+/* Dark theme base */
+@layer base {
+  html {
+    @apply bg-gray-950 text-gray-100;
+  }
+}
+
+/* Dark theme form inputs (Tailwind/DaisyUI-style) */
+@layer components {
+  .input.input-bordered,
+  .input-bordered {
+    @apply bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500;
+  }
+  select.input-bordered,
+  select.input.input-bordered {
+    @apply bg-gray-700 border-gray-600 text-gray-100;
+  }
+  .file-input.file-input-bordered {
+    @apply bg-gray-700 border-gray-600 text-gray-100;
+  }
+}

@@ -1,13 +1,13 @@
 <%# Progress Cards with Horizontal Progress Bars %>
 <%= turbo_frame_tag "widget_progress" do %>
-  <div class="card bg-white shadow-md">
+  <div class="card bg-gray-800 border border-gray-700 shadow-md">
     <div class="card-body">
-      <h2 class="card-title text-lg font-bold text-gray-900 mb-4">Progress Overview</h2>
+      <h2 class="card-title text-lg font-bold text-gray-100 mb-4">Progress Overview</h2>
       <div class="space-y-4">
         <div>
           <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-medium text-gray-700">Fee Collection</span>
-            <span class="text-sm font-bold text-gray-900">0%</span>
+            <span class="text-sm font-medium text-gray-300">Fee Collection</span>
+            <span class="text-sm font-bold text-gray-100">0%</span>
           </div>
           <progress class="progress progress-primary w-full" value="0" max="100"></progress>
           <p class="text-xs text-gray-500 mt-1">$0 of $0 collected</p>
@@ -15,8 +15,8 @@
 
         <div>
           <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-medium text-gray-700">Attendance Rate</span>
-            <span class="text-sm font-bold text-gray-900">0%</span>
+            <span class="text-sm font-medium text-gray-300">Attendance Rate</span>
+            <span class="text-sm font-bold text-gray-100">0%</span>
           </div>
           <progress class="progress progress-success w-full" value="0" max="100"></progress>
           <p class="text-xs text-gray-500 mt-1">0 of 0 students present</p>
@@ -24,8 +24,8 @@
 
         <div>
           <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-medium text-gray-700">Classroom Capacity</span>
-            <span class="text-sm font-bold text-gray-900">0%</span>
+            <span class="text-sm font-medium text-gray-300">Classroom Capacity</span>
+            <span class="text-sm font-bold text-gray-100">0%</span>
           </div>
           <progress class="progress progress-info w-full" value="0" max="100"></progress>
           <p class="text-xs text-gray-500 mt-1">0 of 0 seats filled</p>

@@ -1,0 +1,109 @@
+<%= form_with model: @classroom, local: true, class: "space-y-6" do |f| %>
+  <% if @classroom.errors.any? %>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="font-bold">Please fix the following errors:</h3>
+        <ul class="list-disc list-inside">
+          <% @classroom.errors.full_messages.each do |error| %>
+            <li><%= error %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="card bg-gray-800 border border-gray-700 shadow-md">
+    <div class="card-body">
+      <h2 class="card-title text-xl mb-4 text-gray-100">Classroom Information</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+          <%= f.label :name, class: "label" do %>
+            <span class="label-text text-gray-300">Classroom Name <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.text_field :name,
+              class: "input input-bordered w-full",
+              placeholder: "e.g., Grade 1 - Section A",
+              required: true %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :grade_level, class: "label" do %>
+            <span class="label-text text-gray-300">Grade Level <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.select :grade_level,
+              options_for_select([
+                ["Grade 1", 1],
+                ["Grade 2", 2],
+                ["Grade 3", 3],
+                ["Grade 4", 4],
+                ["Grade 5", 5],
+                ["Grade 6", 6],
+                ["Grade 7", 7],
+                ["Grade 8", 8]
+              ], @classroom.grade_level),
+              {},
+              { class: "select select-bordered w-full", required: true } %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :section, class: "label" do %>
+            <span class="label-text text-gray-300">Section</span>
+          <% end %>
+          <%= f.text_field :section,
+              class: "input input-bordered w-full",
+              placeholder: "e.g., A, B, C" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :academic_year, class: "label" do %>
+            <span class="label-text text-gray-300">Academic Year <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.number_field :academic_year,
+              class: "input input-bordered w-full",
+              required: true,
+              min: 2000,
+              max: 2100 %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :capacity, class: "label" do %>
+            <span class="label-text text-gray-300">Capacity <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.number_field :capacity,
+              class: "input input-bordered w-full",
+              required: true,
+              min: 1,
+              placeholder: "Maximum number of students" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :room_number, class: "label" do %>
+            <span class="label-text text-gray-300">Room Number</span>
+          <% end %>
+          <%= f.text_field :room_number,
+              class: "input input-bordered w-full",
+              placeholder: "e.g., 101, 102" %>
+        </div>
+
+        <div class="form-control md:col-span-2">
+          <%= f.label :class_teacher_id, class: "label" do %>
+            <span class="label-text text-gray-300">Class Teacher</span>
+          <% end %>
+          <%= f.select :class_teacher_id,
+              options_from_collection_for_select(@teachers, :id, :full_name_with_email, @classroom.class_teacher_id),
+              { include_blank: "Select teacher..." },
+              { class: "select select-bordered w-full" } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Form Actions %>
+  <div class="flex justify-end gap-3">
+    <%= link_to "Cancel", @classroom.persisted? ? classroom_path(@classroom) : classrooms_path, class: "btn btn-ghost" %>
+    <%= f.submit @classroom.persisted? ? "Update Classroom" : "Create Classroom", class: "btn btn-primary" %>
+  </div>
+<% end %>

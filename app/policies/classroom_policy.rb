@@ -17,6 +17,15 @@ class ClassroomPolicy < ApplicationPolicy
     admin? || (teacher? && teaches_classroom?)
   end
 
+  # Custom member actions
+  def enroll_students?
+    update?
+  end
+
+  def update_enrollment?
+    update?
+  end
+
   def destroy?
     admin?
   end
@@ -26,11 +35,22 @@ class ClassroomPolicy < ApplicationPolicy
       if user.admin?
         scope.all
       elsif user.teacher?
-        # Teachers see their own classrooms (to be implemented when models exist)
-        scope.all
+        # Teachers see their own classrooms
+        if user.teacher_profile
+          scope.where(class_teacher_id: user.id)
+        else
+          scope.none
+        end
       elsif user.parent?
-        # Parents see classrooms of their children (to be implemented when models exist)
-        scope.all
+        # Parents see classrooms of their children
+        if user.parent_profile
+          scope.joins(:students)
+                .joins("INNER JOIN parent_student_relationships ON parent_student_relationships.student_id = students.id")
+                .where(parent_student_relationships: { parent_id: user.id })
+                .distinct
+        else
+          scope.none
+        end
       else
         scope.none
       end
@@ -40,8 +60,6 @@ class ClassroomPolicy < ApplicationPolicy
   private
 
   def teaches_classroom?
-    # Placeholder - will be implemented when Classroom model exists
-    # user.teacher? && record.teacher_id == user.teacher_profile.id
-    false
+    user.teacher? && record.class_teacher_id == user.id
   end
 end

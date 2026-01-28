@@ -1,0 +1,40 @@
+<tr>
+  <td>
+    <span class="font-mono text-sm text-gray-100"><%= student.admission_number %></span>
+  </td>
+  <td>
+    <div class="flex items-center gap-3">
+      <% if student.photo.attached? %>
+        <%= image_tag student.photo, class: "w-10 h-10 rounded-full object-cover" %>
+      <% else %>
+        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+          <span class="text-gray-300 text-sm font-medium"><%= student.user.first_name&.first&.upcase || "?" %></span>
+        </div>
+      <% end %>
+      <div>
+        <div class="font-medium text-gray-100"><%= student.full_name %></div>
+        <div class="text-sm text-gray-600"><%= student.user.email_address %></div>
+      </div>
+    </div>
+  </td>
+  <td>
+    <% case student.status %>
+    <% when "active" %>
+      <span class="badge badge-success">Active</span>
+    <% when "inactive" %>
+      <span class="badge badge-error">Inactive</span>
+    <% when "graduated" %>
+      <span class="badge badge-info">Graduated</span>
+    <% when "transferred" %>
+      <span class="badge badge-warning">Transferred</span>
+    <% end %>
+  </td>
+  <td>
+    <%= link_to student_path(student), class: "btn btn-sm btn-ghost" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+      </svg>
+    <% end %>
+  </td>
+</tr>
