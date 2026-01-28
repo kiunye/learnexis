@@ -1,0 +1,11 @@
+<%# locals: present_count, absent_count, late_count, excused_count, total, saved (optional) %>
+<div class="flex flex-wrap gap-2 items-center">
+  <span class="badge badge-success text-gray-900">Present: <%= present_count %></span>
+  <span class="badge badge-error text-gray-900">Absent: <%= absent_count %></span>
+  <span class="badge badge-warning text-gray-900">Late: <%= late_count %></span>
+  <span class="badge badge-info text-gray-900">Excused: <%= excused_count %></span>
+  <span class="text-gray-600 text-sm">Total: <%= total %></span>
+  <% if local_assigns[:saved] && saved %>
+    <span class="text-success text-sm font-medium">Saved</span>
+  <% end %>
+</div>

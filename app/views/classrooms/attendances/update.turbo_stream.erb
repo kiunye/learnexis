@@ -1,0 +1,16 @@
+<%= turbo_stream.update "attendance_summary" do %>
+  <%= render partial: "classrooms/attendances/attendance_summary", locals: {
+    present_count: @summary[:present],
+    absent_count: @summary[:absent],
+    late_count: @summary[:late],
+    excused_count: @summary[:excused],
+    total: @summary[:total],
+    saved: true
+  } %>
+<% end %>
+<%= turbo_stream.update "attendance_register" do %>
+  <%= render partial: "classrooms/attendances/mark_form_content", locals: {
+    students: @students,
+    attendances_by_student: @attendances_by_student
+  } %>
+<% end %>

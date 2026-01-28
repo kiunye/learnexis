@@ -41,7 +41,17 @@ module Classrooms
       )
 
       if service.success?
-        redirect_to classroom_attendances_path(@classroom, date: date), notice: "Attendance saved."
+        @date = date
+        @students = @classroom.students.includes(:user).order("users.first_name, users.last_name").references(:users)
+        @attendances_by_student = Attendance.for_classroom(@classroom).for_date(@date).index_by(&:student_id)
+        @summary = attendance_summary_for(@attendances_by_student)
+
+        respond_to do |format|
+          format.html { redirect_to classroom_attendances_path(@classroom, date: date), notice: "Attendance saved." }
+          format.turbo_stream do
+            render :update, status: :ok
+          end
+        end
       else
         redirect_to mark_classroom_attendances_path(@classroom, date: date), alert: "Could not save attendance: #{service.errors.join(', ')}"
       end
@@ -77,6 +87,19 @@ module Classrooms
 
     def permitted_attendances
       params.permit(attendances: %i[student_id status remarks])[:attendances]
+    end
+
+    def attendance_summary_for(attendances_by_student)
+      present = absent = late = excused = 0
+      attendances_by_student.each_value do |a|
+        case a.status
+        when "present" then present += 1
+        when "absent" then absent += 1
+        when "late" then late += 1
+        when "excused" then excused += 1
+        end
+      end
+      { present: present, absent: absent, late: late, excused: excused, total: attendances_by_student.size }
     end
   end
 end
