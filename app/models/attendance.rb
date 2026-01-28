@@ -16,6 +16,7 @@ class Attendance < ApplicationRecord
   validate :attendance_date_not_future
 
   before_save :set_marked_at, if: :marked_by_id_changed?
+  after_commit :enqueue_absence_notification, on: [ :create, :update ]
 
   scope :for_date, ->(date) { where(attendance_date: date) }
   scope :for_classroom, ->(classroom) { where(classroom: classroom) }
@@ -31,5 +32,12 @@ class Attendance < ApplicationRecord
 
   def set_marked_at
     self.marked_at = Time.current
+  end
+
+  def enqueue_absence_notification
+    return unless absent?
+    return unless saved_change_to_status?
+
+    AttendanceNotificationJob.perform_later(id)
   end
 end
