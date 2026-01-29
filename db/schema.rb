@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_28_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_28_140247) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -70,6 +70,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_28_100000) do
     t.index ["class_teacher_id"], name: "index_classrooms_on_class_teacher_id"
     t.index ["grade_level"], name: "index_classrooms_on_grade_level"
     t.index ["name", "academic_year"], name: "index_classrooms_on_name_and_academic_year", unique: true
+  end
+
+  create_table "fee_assignments", force: :cascade do |t|
+    t.decimal "amount_override", precision: 12, scale: 2
+    t.datetime "created_at", null: false
+    t.decimal "discount_amount", precision: 12, scale: 2, default: "0.0"
+    t.decimal "discount_percent", precision: 5, scale: 2, default: "0.0"
+    t.boolean "exempt", default: false, null: false
+    t.integer "fee_id", null: false
+    t.integer "installment_count", default: 1
+    t.integer "status", default: 0, null: false
+    t.integer "student_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fee_id", "student_id"], name: "index_fee_assignments_on_fee_id_and_student_id", unique: true
+    t.index ["fee_id"], name: "index_fee_assignments_on_fee_id"
+    t.index ["student_id"], name: "index_fee_assignments_on_student_id"
+  end
+
+  create_table "fees", force: :cascade do |t|
+    t.integer "academic_year", null: false
+    t.decimal "amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.date "due_date"
+    t.integer "fee_type", default: 0, null: false
+    t.string "name", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["academic_year", "fee_type"], name: "index_fees_on_academic_year_and_fee_type"
   end
 
   create_table "parent_profiles", force: :cascade do |t|
@@ -163,6 +191,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_28_100000) do
   add_foreign_key "attendances", "students"
   add_foreign_key "attendances", "users", column: "marked_by_id"
   add_foreign_key "classrooms", "users", column: "class_teacher_id"
+  add_foreign_key "fee_assignments", "fees"
+  add_foreign_key "fee_assignments", "students"
   add_foreign_key "parent_profiles", "users"
   add_foreign_key "parent_student_relationships", "students"
   add_foreign_key "parent_student_relationships", "users", column: "parent_id"

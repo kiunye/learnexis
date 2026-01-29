@@ -1,0 +1,17 @@
+<% content_for :title, "Edit #{@fee.name}" %>
+
+<div>
+  <div class="mb-6">
+    <div class="breadcrumbs text-sm mb-2">
+      <ul>
+        <li><%= link_to "Fees", fees_path, class: "text-blue-600 hover:text-blue-700" %></li>
+        <li><%= link_to @fee.name, fee_path(@fee), class: "text-blue-600 hover:text-blue-700" %></li>
+        <li>Edit</li>
+      </ul>
+    </div>
+    <h1 class="text-3xl font-bold text-gray-100">Edit Fee</h1>
+    <p class="text-gray-600 mt-1"><%= @fee.name %></p>
+  </div>
+
+  <%= render "form", fee: @fee %>
+</div>

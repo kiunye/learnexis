@@ -4,6 +4,8 @@ class Student < ApplicationRecord
   has_many :parent_student_relationships, dependent: :destroy
   has_many :parents, through: :parent_student_relationships, source: :parent
   has_many :attendances, dependent: :destroy
+  has_many :fee_assignments, dependent: :destroy
+  has_many :fees, through: :fee_assignments
 
   has_one_attached :photo
 

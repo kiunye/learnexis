@@ -1,0 +1,130 @@
+<% content_for :title, "Fees" %>
+
+<div>
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-100">Fees</h1>
+      <p class="text-gray-600 mt-1">Manage fee structures and assignments</p>
+    </div>
+    <% if policy(Fee).create? %>
+      <%= link_to new_fee_path, class: "btn btn-primary", data: { turbo_frame: "_top" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        New Fee
+      <% end %>
+    <% end %>
+  </div>
+
+  <%= turbo_frame_tag "fees_filters" do %>
+    <div class="card bg-gray-800 border border-gray-700 shadow-md mb-6">
+      <div class="card-body">
+        <%= form_with url: fees_path, method: :get, local: false, data: { turbo_frame: "fees_list" }, class: "space-y-4" do |f| %>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-gray-300">Academic Year</span>
+              </label>
+              <%= f.select :academic_year,
+                  options_for_select([
+                    [ Date.current.year, Date.current.year ],
+                    [ Date.current.year - 1, Date.current.year - 1 ],
+                    [ Date.current.year + 1, Date.current.year + 1 ]
+                  ], params[:academic_year] || Date.current.year),
+                  {},
+                  { class: "select select-bordered w-full", data: { action: "change->search#submit" } } %>
+            </div>
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-gray-300">Type</span>
+              </label>
+              <%= f.select :fee_type,
+                  options_for_select([
+                    [ "All", "" ],
+                    [ "Tuition", "tuition" ],
+                    [ "Transport", "transport" ],
+                    [ "Other", "other" ]
+                  ], params[:fee_type]),
+                  {},
+                  { class: "select select-bordered w-full", data: { action: "change->search#submit" } } %>
+            </div>
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-gray-300">Status</span>
+              </label>
+              <%= f.select :status,
+                  options_for_select([
+                    [ "All", "" ],
+                    [ "Active", "active" ],
+                    [ "Inactive", "inactive" ]
+                  ], params[:status]),
+                  {},
+                  { class: "select select-bordered w-full", data: { action: "change->search#submit" } } %>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <%= f.submit "Filter", class: "btn btn-primary" %>
+            <%= link_to "Clear", fees_path, class: "btn btn-ghost", data: { turbo_frame: "_top" } %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%= turbo_frame_tag "fees_list" do %>
+    <div class="card bg-gray-800 border border-gray-700 shadow-md">
+      <div class="card-body">
+        <div class="overflow-x-auto">
+          <table class="table table-zebra w-full">
+            <thead>
+              <tr>
+                <th class="text-gray-100">Name</th>
+                <th class="text-gray-100">Type</th>
+                <th class="text-gray-100">Amount</th>
+                <th class="text-gray-100">Year</th>
+                <th class="text-gray-100">Status</th>
+                <th class="text-gray-100">Assignments</th>
+                <th class="text-gray-100">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if @fees.any? %>
+                <%= render partial: "fee_row", collection: @fees, as: :fee %>
+              <% else %>
+                <tr>
+                  <td colspan="7" class="text-center text-gray-300 py-8">
+                    No fees found.
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <% if @pagy && @pagy.pages > 1 %>
+          <div class="mt-6 flex justify-center">
+            <div class="join">
+              <% if @pagy.prev %>
+                <%= link_to "«", fees_path(page: @pagy.prev, academic_year: params[:academic_year], fee_type: params[:fee_type], status: params[:status]), class: "join-item btn" %>
+              <% else %>
+                <button class="join-item btn btn-disabled">«</button>
+              <% end %>
+              <% @pagy.series.each do |item| %>
+                <% if item.is_a?(Integer) %>
+                  <%= link_to item, fees_path(page: item, academic_year: params[:academic_year], fee_type: params[:fee_type], status: params[:status]), class: "join-item btn #{'btn-active' if item == @pagy.page}" %>
+                <% elsif item == :gap %>
+                  <button class="join-item btn btn-disabled">...</button>
+                <% end %>
+              <% end %>
+              <% if @pagy.next %>
+                <%= link_to "»", fees_path(page: @pagy.next, academic_year: params[:academic_year], fee_type: params[:fee_type], status: params[:status]), class: "join-item btn" %>
+              <% else %>
+                <button class="join-item btn btn-disabled">»</button>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

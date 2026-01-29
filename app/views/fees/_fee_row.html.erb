@@ -1,0 +1,24 @@
+<tr>
+  <td class="text-gray-300 font-medium">
+    <%= link_to fee.name, fee_path(fee), class: "link link-hover text-gray-100" %>
+  </td>
+  <td>
+    <span class="badge badge-outline text-gray-900"><%= fee.fee_type.humanize %></span>
+  </td>
+  <td class="text-gray-300"><%= number_to_currency(fee.amount) %></td>
+  <td class="text-gray-300"><%= fee.academic_year %></td>
+  <td>
+    <% if fee.active? %>
+      <span class="badge badge-success">Active</span>
+    <% else %>
+      <span class="badge badge-ghost text-gray-600">Inactive</span>
+    <% end %>
+  </td>
+  <td class="text-gray-300"><%= fee.fee_assignments.size %></td>
+  <td>
+    <%= link_to "View", fee_path(fee), class: "btn btn-ghost btn-sm", data: { turbo_frame: "_top" } %>
+    <% if policy(fee).update? %>
+      <%= link_to "Edit", edit_fee_path(fee), class: "btn btn-ghost btn-sm", data: { turbo_frame: "_top" } %>
+    <% end %>
+  </td>
+</tr>

@@ -1,0 +1,16 @@
+<% content_for :title, "New Fee" %>
+
+<div>
+  <div class="mb-6">
+    <div class="breadcrumbs text-sm mb-2">
+      <ul>
+        <li><%= link_to "Fees", fees_path, class: "text-blue-600 hover:text-blue-700" %></li>
+        <li>New Fee</li>
+      </ul>
+    </div>
+    <h1 class="text-3xl font-bold text-gray-100">New Fee</h1>
+    <p class="text-gray-600 mt-1">Create a new fee structure</p>
+  </div>
+
+  <%= render "form", fee: @fee %>
+</div>

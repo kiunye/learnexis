@@ -1,9 +1,8 @@
 class FeePolicy < ApplicationPolicy
-  # Placeholder policy - will be extended when Fee model is created in Task 12
-  # Based on PRD: All authenticated users can view fees, only admins can manage
+  # All authenticated users can view fees; only admins can manage.
 
   def index?
-    true # All authenticated users can view fees
+    true
   end
 
   def show?
@@ -22,9 +21,16 @@ class FeePolicy < ApplicationPolicy
     admin?
   end
 
+  def assign_students?
+    admin?
+  end
+
+  def update_assignments?
+    admin?
+  end
+
   class Scope < ApplicationPolicy::Scope
     def resolve
-      # All authenticated users can see fees
       scope.all
     end
   end

@@ -1,0 +1,69 @@
+<% content_for :title, "Assign Students to #{@fee.name}" %>
+
+<div>
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <div class="breadcrumbs text-sm mb-2">
+        <ul>
+          <li><%= link_to "Fees", fees_path, class: "text-blue-600 hover:text-blue-700" %></li>
+          <li><%= link_to @fee.name, fee_path(@fee), class: "text-blue-600 hover:text-blue-700" %></li>
+          <li>Assign Students</li>
+        </ul>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-100">Assign Students to <%= @fee.name %></h1>
+      <p class="text-gray-600 mt-1">Select students to add to this fee. Already assigned students are not listed.</p>
+    </div>
+    <%= link_to fee_path(@fee), class: "btn btn-ghost" do %>
+      Back to Fee
+    <% end %>
+  </div>
+
+  <%= form_with url: update_assignments_fee_path(@fee), method: :patch, local: true, class: "space-y-4" do |f| %>
+    <div class="card bg-gray-800 border border-gray-700 shadow-md">
+      <div class="card-body">
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text text-gray-300 font-medium">Select Students to Assign</span>
+          </label>
+          <div class="max-h-96 overflow-y-auto border border-gray-700 rounded-lg p-4 space-y-2">
+            <% if @students.any? %>
+              <% @students.each do |student| %>
+                <label class="flex items-center gap-3 cursor-pointer hover:bg-gray-700 p-2 rounded">
+                  <%= check_box_tag "student_ids[]",
+                      student.id,
+                      false,
+                      class: "checkbox checkbox-primary" %>
+                  <div class="flex items-center gap-3 flex-1">
+                    <% if student.user %>
+                      <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
+                        <span class="text-gray-300 text-xs font-medium"><%= student.user.first_name&.first&.upcase || "?" %></span>
+                      </div>
+                    <% end %>
+                    <div class="flex-1">
+                      <p class="font-medium text-gray-100"><%= student.full_name %></p>
+                      <p class="text-sm text-gray-600">
+                        <%= student.admission_number %>
+                        <% if student.classroom %>
+                          • <%= student.classroom.name %>
+                        <% else %>
+                          • Not in a classroom
+                        <% end %>
+                      </p>
+                    </div>
+                  </div>
+                </label>
+              <% end %>
+            <% else %>
+              <p class="text-gray-600 text-center py-4">All active students are already assigned to this fee.</p>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="flex gap-2 mt-4">
+          <%= link_to "Cancel", fee_path(@fee), class: "btn btn-ghost", data: { turbo_frame: "_top" } %>
+          <%= f.submit "Assign Selected Students", class: "btn btn-primary", disabled: @students.empty? %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

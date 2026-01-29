@@ -11,6 +11,14 @@ Rails.application.routes.draw do
   # Students
   resources :students
 
+  # Fees
+  resources :fees do
+    member do
+      get :assign_students
+      patch :update_assignments
+    end
+  end
+
   # Classrooms
   resources :classrooms do
     member do
