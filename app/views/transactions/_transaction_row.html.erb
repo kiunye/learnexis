@@ -1,0 +1,36 @@
+<tr>
+  <td class="text-gray-300 font-medium">
+    <%= link_to "##{transaction.id}", transaction_path(transaction), class: "link link-hover text-gray-100" %>
+  </td>
+  <td class="text-gray-300"><%= transaction.transaction_date.strftime("%d %b %Y") %></td>
+  <td class="text-gray-300"><%= transaction.student.full_name %></td>
+  <td class="text-gray-300">
+    <% if transaction.invoice_id.present? %>
+      <%= link_to "##{transaction.invoice_id}", invoice_path(transaction.invoice), class: "link link-hover text-gray-100" %>
+    <% else %>
+      —
+    <% end %>
+  </td>
+  <td class="text-gray-300"><%= number_to_currency(transaction.amount) %></td>
+  <td>
+    <span class="badge badge-outline text-gray-900"><%= transaction.payment_method.humanize %></span>
+  </td>
+  <td>
+    <% if transaction.payment? %>
+      <span class="badge badge-success">Payment</span>
+    <% elsif transaction.refund? %>
+      <span class="badge badge-warning">Refund</span>
+    <% else %>
+      <span class="badge badge-ghost text-gray-600"><%= transaction.transaction_type.humanize %></span>
+    <% end %>
+  </td>
+  <td>
+    <%= link_to "View", transaction_path(transaction), class: "btn btn-ghost btn-sm", data: { turbo_frame: "_top" } %>
+    <% if policy(transaction).download? %>
+      <%= link_to "Receipt", download_transaction_path(transaction), class: "btn btn-ghost btn-sm", target: "_blank", rel: "noopener" %>
+    <% end %>
+    <% if policy(transaction).update? %>
+      <%= link_to "Edit", edit_transaction_path(transaction), class: "btn btn-ghost btn-sm", data: { turbo_frame: "_top" } %>
+    <% end %>
+  </td>
+</tr>

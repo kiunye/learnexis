@@ -1,0 +1,119 @@
+<% content_for :title, "Transactions" %>
+
+<div>
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-100">Transactions</h1>
+      <p class="text-gray-600 mt-1">Payment records and receipts</p>
+    </div>
+    <% if policy(Transaction).create? %>
+      <%= link_to new_transaction_path, class: "btn btn-primary", data: { turbo_frame: "_top" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        Record Payment
+      <% end %>
+    <% end %>
+  </div>
+
+  <%= turbo_frame_tag "transactions_filters" do %>
+    <div class="card bg-gray-800 border border-gray-700 shadow-md mb-6">
+      <div class="card-body">
+        <%= form_with url: transactions_path, method: :get, local: false, data: { turbo_frame: "transactions_list" }, class: "space-y-4" do |f| %>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-gray-300">Student</span>
+              </label>
+              <%= f.select :student_id,
+                  options_from_collection_for_select(
+                    @filter_students,
+                    :id, :full_name, params[:student_id]
+                  ),
+                  { include_blank: "All students" },
+                  { class: "select select-bordered w-full", data: { action: "change->search#submit" } } %>
+            </div>
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-gray-300">Payment Method</span>
+              </label>
+              <%= f.select :payment_method,
+                  options_for_select([
+                    [ "All", "" ],
+                    [ "Cash", "cash" ],
+                    [ "M-Pesa", "mpesa" ],
+                    [ "Bank Transfer", "bank_transfer" ],
+                    [ "Cheque", "cheque" ],
+                    [ "Other", "other" ]
+                  ], params[:payment_method]),
+                  {},
+                  { class: "select select-bordered w-full", data: { action: "change->search#submit" } } %>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <%= f.submit "Filter", class: "btn btn-primary" %>
+            <%= link_to "Clear", transactions_path, class: "btn btn-ghost", data: { turbo_frame: "_top" } %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%= turbo_frame_tag "transactions_list" do %>
+    <div class="card bg-gray-800 border border-gray-700 shadow-md">
+      <div class="card-body">
+        <div class="overflow-x-auto">
+          <table class="table table-zebra w-full">
+            <thead>
+              <tr>
+                <th class="text-gray-100">ID</th>
+                <th class="text-gray-100">Date</th>
+                <th class="text-gray-100">Student</th>
+                <th class="text-gray-100">Invoice</th>
+                <th class="text-gray-100">Amount</th>
+                <th class="text-gray-100">Method</th>
+                <th class="text-gray-100">Type</th>
+                <th class="text-gray-100">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if @transactions.any? %>
+                <%= render partial: "transaction_row", collection: @transactions, as: :transaction %>
+              <% else %>
+                <tr>
+                  <td colspan="8" class="text-center text-gray-300 py-8">
+                    No transactions found.
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <% if @pagy && @pagy.pages > 1 %>
+          <div class="mt-6 flex justify-center">
+            <div class="join">
+              <% if @pagy.prev %>
+                <%= link_to "«", transactions_path(page: @pagy.prev, student_id: params[:student_id], payment_method: params[:payment_method]), class: "join-item btn" %>
+              <% else %>
+                <button class="join-item btn btn-disabled">«</button>
+              <% end %>
+              <% @pagy.series.each do |item| %>
+                <% if item.is_a?(Integer) %>
+                  <%= link_to item, transactions_path(page: item, student_id: params[:student_id], payment_method: params[:payment_method]), class: "join-item btn #{'btn-active' if item == @pagy.page}" %>
+                <% elsif item == :gap %>
+                  <button class="join-item btn btn-disabled">...</button>
+                <% end %>
+              <% end %>
+              <% if @pagy.next %>
+                <%= link_to "»", transactions_path(page: @pagy.next, student_id: params[:student_id], payment_method: params[:payment_method]), class: "join-item btn" %>
+              <% else %>
+                <button class="join-item btn btn-disabled">»</button>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

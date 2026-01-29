@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_29_092444) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_29_101116) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -55,6 +55,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_092444) do
     t.index ["marked_by_id"], name: "index_attendances_on_marked_by_id"
     t.index ["student_id", "attendance_date"], name: "index_attendances_on_student_id_and_attendance_date", unique: true
     t.index ["student_id"], name: "index_attendances_on_student_id"
+  end
+
+  create_table "audit_logs", force: :cascade do |t|
+    t.string "action", null: false
+    t.integer "auditable_id", null: false
+    t.string "auditable_type", null: false
+    t.datetime "created_at", null: false
+    t.text "metadata"
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.index ["auditable_type", "auditable_id"], name: "index_audit_logs_on_auditable_type_and_auditable_id"
+    t.index ["created_at"], name: "index_audit_logs_on_created_at"
+    t.index ["user_id"], name: "index_audit_logs_on_user_id"
   end
 
   create_table "classrooms", force: :cascade do |t|
@@ -199,6 +212,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_092444) do
     t.index ["user_id"], name: "index_teacher_profiles_on_user_id", unique: true
   end
 
+  create_table "transactions", force: :cascade do |t|
+    t.decimal "amount", precision: 12, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.integer "invoice_id"
+    t.text "notes"
+    t.integer "payment_method", default: 0, null: false
+    t.integer "recorded_by_id"
+    t.string "reference"
+    t.integer "student_id", null: false
+    t.date "transaction_date", null: false
+    t.integer "transaction_type", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["invoice_id"], name: "index_transactions_on_invoice_id"
+    t.index ["payment_method"], name: "index_transactions_on_payment_method"
+    t.index ["recorded_by_id"], name: "index_transactions_on_recorded_by_id"
+    t.index ["student_id"], name: "index_transactions_on_student_id"
+    t.index ["transaction_date"], name: "index_transactions_on_transaction_date"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address", null: false
@@ -217,6 +249,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_092444) do
   add_foreign_key "attendances", "classrooms"
   add_foreign_key "attendances", "students"
   add_foreign_key "attendances", "users", column: "marked_by_id"
+  add_foreign_key "audit_logs", "users"
   add_foreign_key "classrooms", "users", column: "class_teacher_id"
   add_foreign_key "fee_assignments", "fees"
   add_foreign_key "fee_assignments", "students"
@@ -230,4 +263,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_092444) do
   add_foreign_key "students", "classrooms"
   add_foreign_key "students", "users"
   add_foreign_key "teacher_profiles", "users"
+  add_foreign_key "transactions", "invoices"
+  add_foreign_key "transactions", "students"
+  add_foreign_key "transactions", "users", column: "recorded_by_id"
 end

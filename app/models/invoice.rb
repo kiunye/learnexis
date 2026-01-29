@@ -1,6 +1,7 @@
 class Invoice < ApplicationRecord
   belongs_to :student
   has_many :invoice_line_items, dependent: :destroy
+  has_many :transactions, dependent: :nullify
 
   enum :status, {
     draft: 0,

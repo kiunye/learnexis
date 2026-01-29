@@ -1,0 +1,112 @@
+<%= form_with model: transaction, local: true, class: "space-y-6" do |f| %>
+  <% if transaction.errors.any? %>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="font-bold">Please fix the following errors:</h3>
+        <ul class="list-disc list-inside">
+          <% transaction.errors.full_messages.each do |error| %>
+            <li><%= error %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="card bg-gray-800 border border-gray-700 shadow-md">
+    <div class="card-body">
+      <h2 class="card-title text-xl mb-4 text-gray-100">Payment Details</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+          <%= f.label :student_id, class: "label" do %>
+            <span class="label-text text-gray-300">Student <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.select :student_id,
+              options_from_collection_for_select(@students, :id, :full_name, transaction.student_id),
+              { include_blank: "Select student..." },
+              { class: "select select-bordered w-full", required: true } %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :invoice_id, class: "label" do %>
+            <span class="label-text text-gray-300">Invoice (optional)</span>
+          <% end %>
+          <%= f.select :invoice_id,
+              options_from_collection_for_select(
+                @invoices,
+                :id,
+                ->(inv) { "##{inv.id} – #{inv.student.full_name} – #{number_to_currency(inv.total_amount)}" },
+                transaction.invoice_id
+              ),
+              { include_blank: "None" },
+              { class: "select select-bordered w-full" } %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :amount, class: "label" do %>
+            <span class="label-text text-gray-300">Amount <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.number_field :amount, class: "input input-bordered w-full", required: true, step: 0.01, min: 0.01, placeholder: "0.00" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :transaction_date, class: "label" do %>
+            <span class="label-text text-gray-300">Date <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.date_field :transaction_date, class: "input input-bordered w-full", required: true %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :payment_method, class: "label" do %>
+            <span class="label-text text-gray-300">Payment Method <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.select :payment_method,
+              options_for_select([
+                [ "Cash", "cash" ],
+                [ "M-Pesa", "mpesa" ],
+                [ "Bank Transfer", "bank_transfer" ],
+                [ "Cheque", "cheque" ],
+                [ "Other", "other" ]
+              ], transaction.payment_method),
+              {},
+              { class: "select select-bordered w-full", required: true } %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :transaction_type, class: "label" do %>
+            <span class="label-text text-gray-300">Type <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.select :transaction_type,
+              options_for_select([
+                [ "Payment", "payment" ],
+                [ "Refund", "refund" ],
+                [ "Adjustment", "adjustment" ]
+              ], transaction.transaction_type),
+              {},
+              { class: "select select-bordered w-full", required: true } %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :reference, class: "label" do %>
+            <span class="label-text text-gray-300">Reference</span>
+          <% end %>
+          <%= f.text_field :reference, class: "input input-bordered w-full", placeholder: "e.g. M-Pesa code" %>
+        </div>
+
+        <div class="form-control md:col-span-2">
+          <%= f.label :notes, class: "label" do %>
+            <span class="label-text text-gray-300">Notes</span>
+          <% end %>
+          <%= f.text_area :notes, class: "textarea textarea-bordered w-full", rows: 3 %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <%= link_to "Cancel", transaction.persisted? ? transaction_path(transaction) : transactions_path, class: "btn btn-ghost", data: { turbo_frame: "_top" } %>
+    <%= f.submit transaction.persisted? ? "Update Transaction" : "Record Payment", class: "btn btn-primary" %>
+  </div>
+<% end %>

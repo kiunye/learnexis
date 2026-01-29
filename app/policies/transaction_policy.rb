@@ -1,6 +1,4 @@
 class TransactionPolicy < ApplicationPolicy
-  # Placeholder policy - will be extended when Transaction model is created in Task 14
-
   def index?
     admin? || teacher? || parent?
   end
@@ -10,7 +8,7 @@ class TransactionPolicy < ApplicationPolicy
   end
 
   def create?
-    admin? || parent? # Parents can make payments
+    admin? || teacher? || parent?
   end
 
   def update?
@@ -21,16 +19,20 @@ class TransactionPolicy < ApplicationPolicy
     admin?
   end
 
+  def download?
+    show?
+  end
+
   class Scope < ApplicationPolicy::Scope
     def resolve
       if user.admin?
         scope.all
       elsif user.teacher?
-        # Teachers see transactions for students in their classrooms (to be implemented)
-        scope.all
+        scope.joins(student: :classroom)
+             .where(classrooms: { class_teacher_id: user.id })
       elsif user.parent?
-        # Parents see their own transactions (to be implemented)
-        scope.all
+        scope.joins(student: :parent_student_relationships)
+             .where(parent_student_relationships: { parent_id: user.id })
       else
         scope.none
       end
@@ -40,8 +42,7 @@ class TransactionPolicy < ApplicationPolicy
   private
 
   def owns_transaction?
-    # Placeholder - will be implemented when Transaction model exists
-    # user.parent? && record.payer_id == user.parent_profile.id
-    false
+    return false unless user.parent?
+    record.student.parents.include?(user)
   end
 end

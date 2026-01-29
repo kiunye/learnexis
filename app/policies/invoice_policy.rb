@@ -32,10 +32,10 @@ class InvoicePolicy < ApplicationPolicy
       if user.admin?
         scope.all
       elsif user.teacher?
-        scope.joins(:student => :classroom)
+        scope.joins(student: :classroom)
              .where(classrooms: { class_teacher_id: user.id })
       elsif user.parent?
-        scope.joins(:student => :parent_student_relationships)
+        scope.joins(student: :parent_student_relationships)
              .where(parent_student_relationships: { parent_id: user.id })
       else
         scope.none

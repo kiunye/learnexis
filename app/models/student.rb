@@ -7,6 +7,7 @@ class Student < ApplicationRecord
   has_many :fee_assignments, dependent: :destroy
   has_many :fees, through: :fee_assignments
   has_many :invoices, dependent: :destroy
+  has_many :transactions, dependent: :nullify
 
   has_one_attached :photo
 

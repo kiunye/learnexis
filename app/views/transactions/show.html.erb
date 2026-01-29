@@ -1,0 +1,112 @@
+<% content_for :title, "Transaction ##{@transaction.id}" %>
+
+<div>
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <div class="breadcrumbs text-sm mb-2">
+        <ul>
+          <li><%= link_to "Transactions", transactions_path, class: "text-blue-600 hover:text-blue-700" %></li>
+          <li>Transaction #<%= @transaction.id %></li>
+        </ul>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-100">Transaction #<%= @transaction.id %></h1>
+      <p class="text-gray-600 mt-1">
+        <%= @transaction.student.full_name %> • <%= number_to_currency(@transaction.amount) %> • <%= @transaction.transaction_date.strftime("%d %b %Y") %>
+        <% if @transaction.payment? %>
+          <span class="badge badge-success ml-1">Payment</span>
+        <% elsif @transaction.refund? %>
+          <span class="badge badge-warning ml-1">Refund</span>
+        <% else %>
+          <span class="badge badge-ghost text-gray-600 ml-1"><%= @transaction.transaction_type.humanize %></span>
+        <% end %>
+      </p>
+    </div>
+    <div class="flex gap-2">
+      <% if policy(@transaction).download? %>
+        <%= link_to download_transaction_path(@transaction), class: "btn btn-primary", target: "_blank", rel: "noopener" do %>
+          Download Receipt
+        <% end %>
+      <% end %>
+      <% if policy(@transaction).update? %>
+        <%= link_to edit_transaction_path(@transaction), class: "btn btn-secondary", data: { turbo_frame: "_top" } do %>
+          Edit
+        <% end %>
+      <% end %>
+      <%= link_to transactions_path, class: "btn btn-ghost" do %>
+        Back to List
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card bg-gray-800 border border-gray-700 shadow-md max-w-2xl">
+    <div class="card-body">
+      <h2 class="card-title text-xl mb-4 text-gray-100">Details</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="label">
+            <span class="label-text text-gray-600">Student</span>
+          </label>
+          <p class="text-gray-300"><%= @transaction.student.full_name %></p>
+          <p class="text-sm text-gray-600"><%= @transaction.student.admission_number %></p>
+        </div>
+        <div>
+          <label class="label">
+            <span class="label-text text-gray-600">Amount</span>
+          </label>
+          <p class="text-gray-300 text-lg font-medium"><%= number_to_currency(@transaction.amount) %></p>
+        </div>
+        <div>
+          <label class="label">
+            <span class="label-text text-gray-600">Date</span>
+          </label>
+          <p class="text-gray-300"><%= @transaction.transaction_date.strftime("%d %b %Y") %></p>
+        </div>
+        <div>
+          <label class="label">
+            <span class="label-text text-gray-600">Payment Method</span>
+          </label>
+          <p class="text-gray-300"><%= @transaction.payment_method.humanize %></p>
+        </div>
+        <div>
+          <label class="label">
+            <span class="label-text text-gray-600">Type</span>
+          </label>
+          <p class="text-gray-300"><%= @transaction.transaction_type.humanize %></p>
+        </div>
+        <div>
+          <label class="label">
+            <span class="label-text text-gray-600">Invoice</span>
+          </label>
+          <% if @transaction.invoice_id.present? %>
+            <p class="text-gray-300"><%= link_to "Invoice ##{@transaction.invoice_id}", invoice_path(@transaction.invoice), class: "link link-hover text-gray-100" %></p>
+            <p class="text-sm text-gray-600">Status: <%= @transaction.invoice.status.humanize %></p>
+          <% else %>
+            <p class="text-gray-600">—</p>
+          <% end %>
+        </div>
+        <div class="md:col-span-2">
+          <label class="label">
+            <span class="label-text text-gray-600">Reference</span>
+          </label>
+          <p class="text-gray-300"><%= @transaction.reference.presence || "—" %></p>
+        </div>
+        <% if @transaction.notes.present? %>
+          <div class="md:col-span-2">
+            <label class="label">
+              <span class="label-text text-gray-600">Notes</span>
+            </label>
+            <p class="text-gray-300"><%= @transaction.notes %></p>
+          </div>
+        <% end %>
+        <% if @transaction.recorded_by.present? %>
+          <div>
+            <label class="label">
+              <span class="label-text text-gray-600">Recorded by</span>
+            </label>
+            <p class="text-gray-300"><%= @transaction.recorded_by.full_name %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

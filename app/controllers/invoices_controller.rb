@@ -5,7 +5,7 @@ class InvoicesController < ApplicationController
   def index
     authorize Invoice
 
-    scope = policy_scope(Invoice).includes(:student => :user)
+    scope = policy_scope(Invoice).includes(student: :user)
     @filter_students = policy_scope(Student).includes(:user).joins(:user).order("users.last_name", "users.first_name")
 
     if params[:status].present? && Invoice.statuses.key?(params[:status])
@@ -28,7 +28,7 @@ class InvoicesController < ApplicationController
   end
 
   def show
-    @invoice_line_items = @invoice.invoice_line_items.includes(:fee_assignment => :fee)
+    @invoice_line_items = @invoice.invoice_line_items.includes(fee_assignment: :fee)
   end
 
   def new
