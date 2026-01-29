@@ -148,7 +148,8 @@ class StudentsController < ApplicationController
       :emergency_contact_name,
       :emergency_contact_phone,
       :blood_group,
-      :classroom_id
+      :classroom_id,
+      :photo
     )
   end
 

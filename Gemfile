@@ -40,6 +40,10 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "chartkick"
 gem "groupdate"
 
+# PDF generation
+gem "prawn"
+gem "prawn-table"
+
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
 gem "solid_cache"
 gem "solid_queue"

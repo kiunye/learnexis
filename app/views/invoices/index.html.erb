@@ -1,0 +1,125 @@
+<% content_for :title, "Invoices" %>
+
+<div>
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-100">Invoices</h1>
+      <p class="text-gray-600 mt-1">View and manage student invoices</p>
+    </div>
+    <div class="flex gap-2">
+      <% if policy(Invoice).create? %>
+        <%= link_to new_invoice_path, class: "btn btn-primary", data: { turbo_frame: "_top" } do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          New Invoice
+        <% end %>
+      <% end %>
+      <% if policy(Invoice).bulk_generate? %>
+        <%= link_to bulk_generate_invoices_path, class: "btn btn-secondary", data: { turbo_frame: "_top" } do %>
+          Bulk Generate
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <%= turbo_frame_tag "invoices_filters" do %>
+    <div class="card bg-gray-800 border border-gray-700 shadow-md mb-6">
+      <div class="card-body">
+        <%= form_with url: invoices_path, method: :get, local: false, data: { turbo_frame: "invoices_list" }, class: "space-y-4" do |f| %>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-gray-300">Status</span>
+              </label>
+              <%= f.select :status,
+                  options_for_select([
+                    [ "All", "" ],
+                    [ "Draft", "draft" ],
+                    [ "Pending", "pending" ],
+                    [ "Paid", "paid" ],
+                    [ "Overdue", "overdue" ],
+                    [ "Cancelled", "cancelled" ]
+                  ], params[:status]),
+                  {},
+                  { class: "select select-bordered w-full", data: { action: "change->search#submit" } } %>
+            </div>
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text text-gray-300">Student</span>
+              </label>
+              <%= f.select :student_id,
+                  options_from_collection_for_select(
+                    @filter_students,
+                    :id, :full_name, params[:student_id]
+                  ),
+                  { include_blank: "All students" },
+                  { class: "select select-bordered w-full", data: { action: "change->search#submit" } } %>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <%= f.submit "Filter", class: "btn btn-primary" %>
+            <%= link_to "Clear", invoices_path, class: "btn btn-ghost", data: { turbo_frame: "_top" } %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%= turbo_frame_tag "invoices_list" do %>
+    <div class="card bg-gray-800 border border-gray-700 shadow-md">
+      <div class="card-body">
+        <div class="overflow-x-auto">
+          <table class="table table-zebra w-full">
+            <thead>
+              <tr>
+                <th class="text-gray-100">ID</th>
+                <th class="text-gray-100">Student</th>
+                <th class="text-gray-100">Issue Date</th>
+                <th class="text-gray-100">Due Date</th>
+                <th class="text-gray-100">Total</th>
+                <th class="text-gray-100">Status</th>
+                <th class="text-gray-100">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if @invoices.any? %>
+                <%= render partial: "invoice_row", collection: @invoices, as: :invoice %>
+              <% else %>
+                <tr>
+                  <td colspan="7" class="text-center text-gray-300 py-8">
+                    No invoices found.
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <% if @pagy && @pagy.pages > 1 %>
+          <div class="mt-6 flex justify-center">
+            <div class="join">
+              <% if @pagy.prev %>
+                <%= link_to "«", invoices_path(page: @pagy.prev, status: params[:status], student_id: params[:student_id]), class: "join-item btn" %>
+              <% else %>
+                <button class="join-item btn btn-disabled">«</button>
+              <% end %>
+              <% @pagy.series.each do |item| %>
+                <% if item.is_a?(Integer) %>
+                  <%= link_to item, invoices_path(page: item, status: params[:status], student_id: params[:student_id]), class: "join-item btn #{'btn-active' if item == @pagy.page}" %>
+                <% elsif item == :gap %>
+                  <button class="join-item btn btn-disabled">...</button>
+                <% end %>
+              <% end %>
+              <% if @pagy.next %>
+                <%= link_to "»", invoices_path(page: @pagy.next, status: params[:status], student_id: params[:student_id]), class: "join-item btn" %>
+              <% else %>
+                <button class="join-item btn btn-disabled">»</button>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,16 @@
+<% content_for :title, "New Invoice" %>
+
+<div>
+  <div class="mb-6">
+    <div class="breadcrumbs text-sm mb-2">
+      <ul>
+        <li><%= link_to "Invoices", invoices_path, class: "text-blue-600 hover:text-blue-700" %></li>
+        <li>New Invoice</li>
+      </ul>
+    </div>
+    <h1 class="text-3xl font-bold text-gray-100">New Invoice</h1>
+    <p class="text-gray-600 mt-1">Create a draft invoice (use Bulk Generate to create from fee assignments)</p>
+  </div>
+
+  <%= render "form", invoice: @invoice %>
+</div>

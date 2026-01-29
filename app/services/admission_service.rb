@@ -104,7 +104,7 @@ class AdmissionService
   def update_admission(student:, student_params:, user_params: {}, parent_ids: nil)
     ActiveRecord::Base.transaction do
       # Update user if params provided
-      if user_params.any?
+      if user_params.present?
         student.user.update(user_params)
         unless student.user.valid?
           @errors.concat(student.user.errors.full_messages)

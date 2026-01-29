@@ -1,0 +1,83 @@
+<%= form_with model: invoice, local: true, class: "space-y-6" do |f| %>
+  <% if invoice.errors.any? %>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="font-bold">Please fix the following errors:</h3>
+        <ul class="list-disc list-inside">
+          <% invoice.errors.full_messages.each do |error| %>
+            <li><%= error %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="card bg-gray-800 border border-gray-700 shadow-md">
+    <div class="card-body">
+      <h2 class="card-title text-xl mb-4 text-gray-100">Invoice Details</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+          <%= f.label :student_id, class: "label" do %>
+            <span class="label-text text-gray-300">Student <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.select :student_id,
+              options_from_collection_for_select(@students, :id, :full_name, invoice.student_id),
+              { include_blank: "Select student..." },
+              { class: "select select-bordered w-full", required: true } %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :status, class: "label" do %>
+            <span class="label-text text-gray-300">Status</span>
+          <% end %>
+          <%= f.select :status,
+              options_for_select([
+                [ "Draft", "draft" ],
+                [ "Pending", "pending" ],
+                [ "Paid", "paid" ],
+                [ "Overdue", "overdue" ],
+                [ "Cancelled", "cancelled" ]
+              ], invoice.status),
+              {},
+              { class: "select select-bordered w-full" } %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :issue_date, class: "label" do %>
+            <span class="label-text text-gray-300">Issue Date <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.date_field :issue_date, class: "input input-bordered w-full", required: true %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :due_date, class: "label" do %>
+            <span class="label-text text-gray-300">Due Date <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.date_field :due_date, class: "input input-bordered w-full", required: true %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :total_amount, class: "label" do %>
+            <span class="label-text text-gray-300">Total Amount</span>
+          <% end %>
+          <%= f.number_field :total_amount, class: "input input-bordered w-full", min: 0, step: 0.01 %>
+        </div>
+
+        <div class="form-control md:col-span-2">
+          <%= f.label :notes, class: "label" do %>
+            <span class="label-text text-gray-300">Notes</span>
+          <% end %>
+          <%= f.text_area :notes, class: "textarea textarea-bordered w-full", rows: 3 %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <%= link_to "Cancel", invoice.persisted? ? invoice_path(invoice) : invoices_path, class: "btn btn-ghost", data: { turbo_frame: "_top" } %>
+    <%= f.submit invoice.persisted? ? "Update Invoice" : "Create Invoice", class: "btn btn-primary" %>
+  </div>
+<% end %>

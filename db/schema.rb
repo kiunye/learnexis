@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_28_140247) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_29_092444) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -98,6 +98,33 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_28_140247) do
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["academic_year", "fee_type"], name: "index_fees_on_academic_year_and_fee_type"
+  end
+
+  create_table "invoice_line_items", force: :cascade do |t|
+    t.decimal "amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.string "description", default: "", null: false
+    t.integer "fee_assignment_id"
+    t.integer "invoice_id", null: false
+    t.integer "quantity", default: 1, null: false
+    t.decimal "unit_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fee_assignment_id"], name: "index_invoice_line_items_on_fee_assignment_id"
+    t.index ["invoice_id"], name: "index_invoice_line_items_on_invoice_id"
+  end
+
+  create_table "invoices", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "due_date", null: false
+    t.date "issue_date", null: false
+    t.text "notes"
+    t.integer "status", default: 0, null: false
+    t.integer "student_id", null: false
+    t.decimal "total_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.datetime "updated_at", null: false
+    t.index ["status"], name: "index_invoices_on_status"
+    t.index ["student_id", "issue_date"], name: "index_invoices_on_student_id_and_issue_date"
+    t.index ["student_id"], name: "index_invoices_on_student_id"
   end
 
   create_table "parent_profiles", force: :cascade do |t|
@@ -193,6 +220,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_28_140247) do
   add_foreign_key "classrooms", "users", column: "class_teacher_id"
   add_foreign_key "fee_assignments", "fees"
   add_foreign_key "fee_assignments", "students"
+  add_foreign_key "invoice_line_items", "fee_assignments"
+  add_foreign_key "invoice_line_items", "invoices"
+  add_foreign_key "invoices", "students"
   add_foreign_key "parent_profiles", "users"
   add_foreign_key "parent_student_relationships", "students"
   add_foreign_key "parent_student_relationships", "users", column: "parent_id"

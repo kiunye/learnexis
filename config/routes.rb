@@ -11,6 +11,17 @@ Rails.application.routes.draw do
   # Students
   resources :students
 
+  # Invoices
+  resources :invoices do
+    member do
+      get :download
+    end
+    collection do
+      get :bulk_generate
+      post "bulk_generate", to: "invoices#create_bulk"
+    end
+  end
+
   # Fees
   resources :fees do
     member do

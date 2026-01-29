@@ -1,6 +1,4 @@
 class InvoicePolicy < ApplicationPolicy
-  # Placeholder policy - will be extended when Invoice model is created in Task 13
-
   def index?
     admin? || teacher? || parent?
   end
@@ -21,16 +19,24 @@ class InvoicePolicy < ApplicationPolicy
     admin?
   end
 
+  def bulk_generate?
+    admin?
+  end
+
+  def download?
+    show?
+  end
+
   class Scope < ApplicationPolicy::Scope
     def resolve
       if user.admin?
         scope.all
       elsif user.teacher?
-        # Teachers see invoices for students in their classrooms (to be implemented)
-        scope.all
+        scope.joins(:student => :classroom)
+             .where(classrooms: { class_teacher_id: user.id })
       elsif user.parent?
-        # Parents see invoices for their children (to be implemented)
-        scope.all
+        scope.joins(:student => :parent_student_relationships)
+             .where(parent_student_relationships: { parent_id: user.id })
       else
         scope.none
       end
@@ -40,8 +46,7 @@ class InvoicePolicy < ApplicationPolicy
   private
 
   def owns_invoice?
-    # Placeholder - will be implemented when Invoice model exists
-    # user.parent? && record.student.parents.include?(user.parent_profile)
-    false
+    return false unless user.parent?
+    record.student.parents.include?(user)
   end
 end
