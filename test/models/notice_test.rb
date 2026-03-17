@@ -99,18 +99,31 @@ class NoticeTest < ActiveSupport::TestCase
   test "target_audience_symbol= sets correct values" do
     notice = Notice.new
     notice.target_audience_symbol = :all
-    assert_nil notice.target_audience
+    assert_equal :all, notice.target_audience_symbol
 
     notice.target_audience_symbol = :teachers
-    assert_equal 0, notice.target_audience
+    assert_equal :teachers, notice.target_audience_symbol
 
     notice.target_audience_symbol = :parents
-    assert_equal 1, notice.target_audience
+    assert_equal :parents, notice.target_audience_symbol
 
     notice.target_audience_symbol = :students
-    assert_equal 2, notice.target_audience
+    assert_equal :students, notice.target_audience_symbol
 
     notice.target_audience_symbol = :specific_grades
-    assert_equal 3, notice.target_audience
+    assert_equal :specific_grades, notice.target_audience_symbol
+  end
+
+  test "target_audience_symbol persists and round-trips after save" do
+    notice = Notice.new(title: "Persist", content: "Content", author: @user, expires_at: 1.day.from_now)
+    notice.target_audience_symbol = :teachers
+    notice.save!
+    notice.reload
+    assert_equal :teachers, notice.target_audience_symbol
+
+    notice.target_audience_symbol = :all
+    notice.save!
+    notice.reload
+    assert_equal :all, notice.target_audience_symbol
   end
 end

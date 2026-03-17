@@ -12,7 +12,7 @@ class Notice < ApplicationRecord
 
   # Validations
   validates :title, :content, presence: true
-  validates :expires_at, comparison: { greater_than: :published_at }, allow_nil: true
+  validates :expires_at, comparison: { greater_than: :published_at }, if: -> { expires_at.present? && published_at.present? }
 
   # Scopes
   scope :active, -> { where(active: true).where("expires_at > ?", Time.current) }
@@ -50,12 +50,13 @@ class Notice < ApplicationRecord
 
   # Returns target_audience as symbol (including :all for nil)
   def target_audience_symbol
-    case self[:target_audience]
+    raw = self[:target_audience]
+    case raw
     when nil then :all
-    when 0 then :teachers
-    when 1 then :parents
-    when 2 then :students
-    when 3 then :specific_grades
+    when 0, "teachers" then :teachers
+    when 1, "parents" then :parents
+    when 2, "students" then :students
+    when 3, "specific_grades" then :specific_grades
     else :all
     end
   end

@@ -16,9 +16,9 @@ module NoticeUpdates
       notice: action == :destroy ? { id: params[:id] } : @notice
     })
 
-    # Also broadcast to specific role channels based on target audience
-    unless action == :destroy || @notice.target_audience == "all"
-      ActionCable.server.broadcast("notice_channel_#{@notice.target_audience}", {
+    # Also broadcast to specific role channels based on target audience (skip when notice is for "all")
+    unless action == :destroy || @notice.target_audience.nil?
+      ActionCable.server.broadcast("notice_channel_#{@notice.target_audience_symbol}", {
         action: action.to_sym,
         notice: action == :destroy ? { id: params[:id] } : @notice
       })
