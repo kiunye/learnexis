@@ -37,6 +37,13 @@ Rails.application.routes.draw do
     end
   end
 
+  # Notices
+  resources :notices do
+    collection do
+      get :search
+    end
+  end
+
   # Classrooms
   resources :classrooms do
     member do

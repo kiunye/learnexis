@@ -1,0 +1,85 @@
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8" data-controller="notice">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">Notices</h2>
+    <div class="flex items-center space-x-4">
+      <% if current_user.admin? || current_user.teacher? %>
+        <%= link_to "New Notice", new_notice_path, class: "btn btn-primary" %>
+      <% end %>
+      
+      <%= turbo_frame_tag "notices-search", src: search_notices_path, class: "hidden" do %>
+        <%= render "shared/search_form", placeholder: "Search notices..." %>
+      <% end %>
+      
+      <%= button_tag "Search", type: "button", class: "btn btn-outline btn-search", data: { controller: "dropdown", action: "click->dropdown#toggle" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M9.75 9.75a4.5 4.5 0 110-9 4.5 4.5 0 010 9z" /></svg>
+      <% end %>
+      
+      <div class="dropdown dropdown-end z-[1]">
+        <div tabindex="0" role="button" class="btn btn-sm btn-circle btn-outline" data-dropdown-toggle="notice-filters-dropdown">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5h6M9 11h6M9 17h6" /></svg>
+        </div>
+        <ul tabindex="0" class="menu dropdown-content z-[1] mt-3 w-52 p-2 shadow bg-base-100 rounded-box" id="notice-filters-dropdown">
+          <li><%= link_to "All Notices", notices_path, class: "flex items-center space-x-2" do %>
+              <span>All</span>
+              <% if params[:priority].blank? && params[:target_audience].blank? %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+          <li><%= link_to "Urgent Notices", notices_path(priority: :urgent), class: "flex items-center space-x-2" do %>
+              <span>Urgent</span>
+              <% if params[:priority] == "urgent" %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+          <li><%= link_to "For Teachers", notices_path(target_audience: :teachers), class: "flex items-center space-x-2" do %>
+              <span>Teachers</span>
+              <% if params[:target_audience] == "teachers" %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+          <li><%= link_to "For Parents", notices_path(target_audience: :parents), class: "flex items-center space-x-2" do %>
+              <span>Parents</span>
+              <% if params[:target_audience] == "parents" %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+          <li><%= link_to "For Students", notices_path(target_audience: :students), class: "flex items-center space-x-2" do %>
+              <span>Students</span>
+              <% if params[:target_audience] == "students" %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-between items-center mb-4">
+    <span class="text-sm text-muted-foreground">
+      <span data-notice-count-target>0</span> notices
+    </span>
+    <% if current_user.admin? || current_user.teacher? %>
+      <%= link_to "Mark All as Read", "#", class: "btn btn-sm btn-outline", data: { action: "click->notice#markAllAsRead" } %>
+    <% end %>
+  </div>
+
+  <% if @notices.any? %>
+    <div id="notice-list" data-notice-list-target class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <% @notices.each do |notice| %>
+        <%= render notice %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-12">
+      <p class="text-muted-foreground">No notices found.</p>
+      <% if current_user.admin? || current_user.teacher? %>
+        <%= link_to "Create First Notice", new_notice_path, class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

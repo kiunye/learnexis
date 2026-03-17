@@ -7,6 +7,9 @@ import { application } from "./application"
 import AttendanceMarkController from "./attendance_mark_controller"
 application.register("attendance-mark", AttendanceMarkController)
 
+import AutoFormatController from "./auto_format_controller"
+application.register("auto-format", AutoFormatController)
+
 import DropdownController from "./dropdown_controller"
 application.register("dropdown", DropdownController)
 
@@ -15,6 +18,9 @@ application.register("flash", FlashController)
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
+
+import NoticeController from "./notice_controller"
+application.register("notice", NoticeController)
 
 import SearchController from "./search_controller"
 application.register("search", SearchController)

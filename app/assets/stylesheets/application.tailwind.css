@@ -9,6 +9,112 @@
 
 /* Dark theme form inputs (Tailwind/DaisyUI-style) */
 @layer components {
+  /* Normalize legacy Tailwind inputs that use inset rings but forget horizontal padding.
+     Prevents the first character from sitting under the ring/border on focus. */
+  input.ring-inset,
+  textarea.ring-inset,
+  select.ring-inset {
+    @apply px-3;
+  }
+
+  .auth-bg {
+    background:
+      radial-gradient(1200px 600px at 20% 10%, rgba(37, 99, 235, 0.35), transparent 55%),
+      radial-gradient(900px 500px at 85% 20%, rgba(59, 130, 246, 0.18), transparent 55%),
+      radial-gradient(800px 600px at 60% 95%, rgba(14, 165, 233, 0.10), transparent 55%),
+      linear-gradient(180deg, rgba(3, 7, 18, 1) 0%, rgba(2, 6, 23, 1) 100%);
+  }
+
+  .auth-grid {
+    background-image:
+      linear-gradient(to right, rgba(148, 163, 184, 0.10) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(148, 163, 184, 0.10) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 70% 55% at 50% 45%, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0) 75%);
+  }
+
+  .auth-card {
+    @apply bg-gray-950/40 border border-white/10 shadow-[0_25px_80px_-35px_rgba(59,130,246,0.55)] backdrop-blur-xl;
+  }
+
+  /* Light, minimalist auth theme (scoped to auth layout) */
+  .auth--light {
+    @apply bg-slate-50 text-slate-900;
+  }
+
+  .auth--light.auth-bg {
+    background: linear-gradient(180deg, rgb(248 250 252) 0%, rgb(241 245 249) 100%);
+  }
+
+  .auth--light .auth-card {
+    @apply bg-white border border-slate-200 shadow-[0_18px_50px_-35px_rgba(15,23,42,0.35)];
+    backdrop-filter: none;
+  }
+
+  .auth-input {
+    /* 44px control height: 12px top + 20px line-height + 12px bottom */
+    @apply block w-full appearance-none rounded-lg border border-white/10 bg-white/5 px-3.5 py-3 text-sm leading-5 text-gray-100;
+    @apply placeholder:text-gray-400/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] outline-none;
+    @apply transition-[background-color,border-color,box-shadow] duration-200;
+    @apply hover:border-white/20 hover:bg-white/7;
+    @apply focus:border-blue-300/60 focus:bg-white/8 focus:outline focus:outline-2 focus:outline-blue-400/35 focus:outline-offset-2;
+  }
+
+  /* Persist browser-preview override for specific auth inputs */
+  #email_address,
+  #password {
+    box-sizing: content-box;
+  }
+
+  .auth--light .auth-input {
+    @apply border-slate-300 bg-white text-slate-900 placeholder:text-slate-400;
+    @apply shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] ring-0;
+    @apply hover:border-slate-400;
+    @apply focus:border-blue-500 focus:outline focus:outline-2 focus:outline-blue-500/30 focus:outline-offset-2;
+  }
+
+  .auth-label {
+    @apply mb-2 block text-sm font-medium text-gray-200;
+  }
+
+  .auth--light .auth-label {
+    @apply text-slate-700;
+  }
+
+  .auth-button {
+    @apply w-full inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white;
+    @apply shadow-[0_12px_30px_-18px_rgba(59,130,246,0.9)] transition;
+    @apply hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/30;
+  }
+
+  .auth--light .auth-button {
+    @apply shadow-[0_12px_30px_-22px_rgba(59,130,246,0.55)];
+  }
+
+  /* Prevent clanky autofill colors on auth inputs */
+  input.auth-input:-webkit-autofill,
+  input.auth-input:-webkit-autofill:hover,
+  input.auth-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: rgb(229 231 235); /* text-gray-200 */
+    transition: background-color 9999s ease-in-out 0s;
+    box-shadow:
+      0 0 0px 1000px rgba(255, 255, 255, 0.06) inset,
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.18);
+    caret-color: rgb(147 197 253); /* blue-300 */
+  }
+
+  .auth--light input.auth-input:-webkit-autofill,
+  .auth--light input.auth-input:-webkit-autofill:hover,
+  .auth--light input.auth-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: rgb(15 23 42); /* slate-900 */
+    box-shadow:
+      0 0 0px 1000px rgb(255 255 255) inset,
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    border-color: rgb(148 163 184); /* slate-400 */
+    caret-color: rgb(37 99 235); /* blue-600 */
+  }
+
   .input.input-bordered,
   .input-bordered {
     @apply bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500;

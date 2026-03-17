@@ -21,6 +21,8 @@ gem "stimulus-rails"
 gem "cssbundling-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
+# Serialization for JSON APIs
+gem "active_model_serializers", "~> 0.10.0"
 # Tailwind CSS for styling [https://tailwindcss.com]
 gem "tailwindcss-rails"
 

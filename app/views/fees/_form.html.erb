@@ -2,7 +2,7 @@
   <% if fee.errors.any? %>
     <div class="alert alert-error">
       <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
       <div>
         <h3 class="font-bold">Please fix the following errors:</h3>
@@ -20,18 +20,17 @@
       <h2 class="card-title text-xl mb-4 text-gray-100">Fee Information</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="form-control">
-          <%= f.label :name, class: "label" do %>
-            <span class="label-text text-gray-300">Name <span class="text-error">*</span></span>
+          <%= f.label :name, class: "label-text text-gray-300 mb-2 block font-medium" do %>
+            Name <span class="text-error text-red-500">*</span>
           <% end %>
           <%= f.text_field :name,
               class: "input input-bordered w-full",
-              placeholder: "e.g., Grade 1 Tuition 2025",
               required: true %>
         </div>
 
         <div class="form-control">
-          <%= f.label :fee_type, class: "label" do %>
-            <span class="label-text text-gray-300">Type <span class="text-error">*</span></span>
+          <%= f.label :fee_type, class: "label-text text-gray-300 mb-2 block font-medium" do %>
+            Type <span class="text-error text-red-500">*</span>
           <% end %>
           <%= f.select :fee_type,
               options_for_select([
@@ -44,20 +43,19 @@
         </div>
 
         <div class="form-control">
-          <%= f.label :amount, class: "label" do %>
-            <span class="label-text text-gray-300">Amount <span class="text-error">*</span></span>
+          <%= f.label :amount, class: "label-text text-gray-300 mb-2 block font-medium" do %>
+            Amount <span class="text-error text-red-500">*</span>
           <% end %>
           <%= f.number_field :amount,
               class: "input input-bordered w-full",
               required: true,
               min: 0,
-              step: 0.01,
-              placeholder: "0.00" %>
+              step: 0.01 %>
         </div>
 
         <div class="form-control">
-          <%= f.label :academic_year, class: "label" do %>
-            <span class="label-text text-gray-300">Academic Year <span class="text-error">*</span></span>
+          <%= f.label :academic_year, class: "label-text text-gray-300 mb-2 block font-medium" do %>
+            Academic Year <span class="text-error text-red-500">*</span>
           <% end %>
           <%= f.number_field :academic_year,
               class: "input input-bordered w-full",
@@ -67,9 +65,8 @@
         </div>
 
         <div class="form-control">
-          <%= f.label :status, class: "label" do %>
-            <span class="label-text text-gray-300">Status</span>
-          <% end %>
+          <%= f.label :status, class: "label-text text-gray-300 mb-2 block font-medium" %>
+          Status
           <%= f.select :status,
               options_for_select([
                 [ "Active", "active" ],
@@ -80,9 +77,8 @@
         </div>
 
         <div class="form-control">
-          <%= f.label :due_date, class: "label" do %>
-            <span class="label-text text-gray-300">Due Date</span>
-          <% end %>
+          <%= f.label :due_date, class: "label-text text-gray-300 mb-2 block font-medium" %>
+          Due Date
           <%= f.date_field :due_date,
               class: "input input-bordered w-full" %>
         </div>

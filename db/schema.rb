@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_29_101116) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_16_083920) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -85,6 +85,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_101116) do
     t.index ["name", "academic_year"], name: "index_classrooms_on_name_and_academic_year", unique: true
   end
 
+  create_table "events", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.datetime "end_datetime"
+    t.integer "event_type"
+    t.string "location"
+    t.boolean "registration_required"
+    t.datetime "start_datetime"
+    t.integer "target_audience"
+    t.string "title"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "fee_assignments", force: :cascade do |t|
     t.decimal "amount_override", precision: 12, scale: 2
     t.datetime "created_at", null: false
@@ -138,6 +151,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_101116) do
     t.index ["status"], name: "index_invoices_on_status"
     t.index ["student_id", "issue_date"], name: "index_invoices_on_student_id_and_issue_date"
     t.index ["student_id"], name: "index_invoices_on_student_id"
+  end
+
+  create_table "notices", force: :cascade do |t|
+    t.boolean "active", default: true
+    t.integer "author_id"
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.datetime "expires_at"
+    t.string "grade_levels", default: ""
+    t.integer "notice_type"
+    t.integer "priority"
+    t.datetime "published_at"
+    t.integer "target_audience"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_notices_on_active"
+    t.index ["author_id"], name: "index_notices_on_author_id"
+    t.index ["expires_at"], name: "index_notices_on_expires_at"
+    t.index ["priority"], name: "index_notices_on_priority"
+    t.index ["published_at"], name: "index_notices_on_published_at"
+    t.index ["target_audience"], name: "index_notices_on_target_audience"
   end
 
   create_table "parent_profiles", force: :cascade do |t|
@@ -256,6 +290,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_101116) do
   add_foreign_key "invoice_line_items", "fee_assignments"
   add_foreign_key "invoice_line_items", "invoices"
   add_foreign_key "invoices", "students"
+  add_foreign_key "notices", "users", column: "author_id"
   add_foreign_key "parent_profiles", "users"
   add_foreign_key "parent_student_relationships", "students"
   add_foreign_key "parent_student_relationships", "users", column: "parent_id"

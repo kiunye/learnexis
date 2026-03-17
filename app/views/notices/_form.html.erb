@@ -1,0 +1,107 @@
+<%= form_with model: notice, class: "space-y-4" do |form| %>
+  <% if notice.errors.any? %>
+    <div class="alert alert-error">
+      <span><%= pluralize(notice.errors.count, "error") %> prohibited this notice from being saved:</span>
+      <ul>
+        <% notice.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-control">
+    <label class="label">
+      <span class="label-text">Title</span>
+    </label>
+    <%= form.text_field :title, class: "input input-bordered w-full", required: true %>
+  </div>
+
+  <div class="form-control">
+    <label class="label">
+      <span class="label-text">Content</span>
+    </label>
+    <%= form.text_area :content, class: "textarea textarea-bordered w-full", rows: 5, required: true %>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Priority</span>
+      </label>
+      <%= form.select :priority, Notice.priorities.keys.map { |k| [k.titleize, k] }, 
+                     { include_blank: "Select priority" }, 
+                     class: "select select-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Notice Type</span>
+      </label>
+      <%= form.select :notice_type, Notice.notice_types.keys.map { |k| [k.titleize, k] }, 
+                     { include_blank: "Select type" }, 
+                     class: "select select-bordered w-full" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Target Audience</span>
+      </label>
+      <%= form.select :target_audience, Notice.target_audiences.keys.map { |k| [k.titleize, k] }, 
+                     { include_blank: "Select audience" }, 
+                     class: "select select-bordered w-full" %>
+    </div>
+
+    <div class="form-control" id="grade-levels-field">
+      <label class="label">
+        <span class="label-text">Grade Levels (for grade-specific notices)</span>
+      </label>
+      <%= form.text_field :grade_levels_array, 
+                         class: "input input-bordered w-full", 
+                         placeholder: "e.g., 1,2,3 for grades 1, 2, and 3",
+                         data: { controller: "auto-format", action: "keyup->auto-format#formatCommaSeparated" } %>
+      <span class="helper-text text-xs">Comma-separated list of grade levels (only applies when audience is "Grade Specific")</span>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Published At</span>
+      </label>
+      <%= form.datetime_local :published_at, 
+                             class: "input input-bordered w-full", 
+                             value: notice.published_at || Time.current %>
+    </div>
+
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Expires At</span>
+      </label>
+      <%= form.datetime_local :expires_at, 
+                             class: "input input-bordered w-full" %>
+    </div>
+  </div>
+
+  <div class="form-control">
+    <label class="label">
+      <span class="label-text">Active</span>
+    </label>
+    <%= form.check_box :active, class: "checkbox checkbox-primary" %>
+  </div>
+
+  <div class="form-control">
+    <label class="label">
+      <span class="label-text">Attachments (optional)</span>
+    </label>
+    <%= form.file_field :attachments, 
+                       class: "file-input file-input-bordered w-full", 
+                       multiple: true %>
+  </div>
+
+  <div class="form-control mt-6">
+    <%= form.submit class: "btn btn-primary w-full" %>
+  </div>
+<% end %>

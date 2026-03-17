@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyString
+  description: MyText
+  event_type: 1
+  start_datetime: 2026-03-16 11:39:20
+  end_datetime: 2026-03-16 11:39:20
+  location: MyString
+  target_audience: 1
+  registration_required: false
+
+two:
+  title: MyString
+  description: MyText
+  event_type: 1
+  start_datetime: 2026-03-16 11:39:20
+  end_datetime: 2026-03-16 11:39:20
+  location: MyString
+  target_audience: 1
+  registration_required: false
