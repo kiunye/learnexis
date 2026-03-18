@@ -23,7 +23,7 @@ class ClassroomsController < ApplicationController
     # Apply search filter
     if params[:search].present?
       search_term = "%#{params[:search]}%"
-      classrooms_scope = classrooms_scope.where("name ILIKE ? OR room_number ILIKE ?", search_term, search_term)
+      classrooms_scope = classrooms_scope.where("name LIKE ? OR room_number LIKE ?", search_term, search_term)
     end
 
     @pagy, @classrooms = pagy(

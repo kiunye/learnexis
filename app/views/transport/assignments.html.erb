@@ -1,0 +1,111 @@
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">Student Assignments</h2>
+    <div class="flex items-center space-x-4">
+      <% if params[:transport_route_id].present? %>
+        <%= link_to "All Assignments", transport_assignments_path, class: "btn btn-outline" %>
+      <% end %>
+      
+      <div class="dropdown dropdown-end z-[1]">
+        <div tabindex="0" role="button" class="btn btn-sm btn-circle btn-outline" data-dropdown-toggle="transport-assignments-filters-dropdown">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5h6M9 11h6M9 17h6" /></svg>
+        </div>
+        <ul tabindex="0" class="menu dropdown-content z-[1] mt-3 w-52 p-2 shadow bg-base-100 rounded-box" id="transport-assignments-filters-dropdown">
+          <li><%= link_to transport_assignments_path, class: "flex items-center space-x-2" do %>
+              <span>All</span>
+              <% if params[:transport_route_id].blank? %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+          <% TransportRoute.active.each do |route| %>
+            <li><%= link_to transport_assignments_path(transport_route_id: route.id), class: "flex items-center space-x-2" do %>
+                <span><%= route.name %></span>
+                <% if params[:transport_route_id] == route.id.to_s %>
+                  <span class="badge badge-secondary ml-auto">active</span>
+                <% end %>
+              <% end %>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-between items-center mb-4">
+    <span class="text-sm text-muted-foreground">
+      <span id="assignments-count"><%= @students.count %></span> students
+    </span>
+    
+    <% if params[:transport_route_id].present? %>
+      <%= link_to "Unassign All", "#", class: "btn btn-sm btn-outline", data: { action: "click->transport#unassignAll" } %>
+    <% end %>
+  </div>
+
+  <% if @students.any? %>
+    <div class="overflow-x-auto">
+      <table class="table w-full">
+        <thead>
+          <tr>
+            <th class="w-1/3">Student</th>
+            <th class="w-1/3">Current Route</th>
+            <th class="w-1/3">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @students.each do |student| %>
+            <tr>
+              <td>
+                <div class="flex items-center space-x-2">
+                  <% if student.photo.attached? %>
+                    <%= image_tag student.photo.variant(resize: "32x32"), class: "rounded-full" %>
+                  <% end %>
+                  <span><%= student.full_name %></span>
+                </div>
+              </td>
+              <td>
+                <% if student.transport_route.present? %>
+                  <span class="badge badge-secondary"><%= student.transport_route.name %></span>
+                <% else %>
+                  <span class="badge badge-outline">Not Assigned</span>
+                <% end %>
+              </td>
+              <td>
+                <% if student.transport_route.present? %>
+                  <%= button_to "Unassign", transport_unassign_student_path(student_id: student.id),
+                                method: :delete,
+                                data: { turbo_confirm: "Are you sure you want to unassign this student from their route?" },
+                                class: "btn btn-sm btn-error" %>
+                <% else %>
+                  <% if params[:transport_route_id].present? %>
+                    <%= button_to "Assign to Route", transport_assign_student_path(student_id: student.id, transport_route_id: params[:transport_route_id]),
+                                  method: :post,
+                                  class: "btn btn-sm btn-primary" %>
+                  <% else %>
+                    <div class="dropdown dropdown-end">
+                      <div tabindex="0" role="button" class="btn btn-sm btn-circle btn-outline" data-dropdown-toggle="assign-route-dropdown-<%= student.id %>">
+                        Assign to Route
+                      </div>
+                      <ul tabindex="0" class="menu dropdown-content z-[1] mt-3 w-52 p-2 shadow bg-base-100 rounded-box" id="assign-route-dropdown-<%= student.id %>">
+                        <% TransportRoute.active.each do |route| %>
+                          <li><%= button_to transport_assign_student_path(student_id: student.id, transport_route_id: route.id),
+                                            method: :post,
+                                            class: "dropdown-item" do %>
+                            <span><%= route.name %></span>
+                          <% end %>
+                        <% end %>
+                      </ul>
+                    </div>
+                  <% end %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="text-center py-12">
+      <p class="text-muted-foreground">No students found.</p>
+    </div>
+  <% end %>
+</div>

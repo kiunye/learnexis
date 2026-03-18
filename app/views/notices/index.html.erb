@@ -10,7 +10,7 @@
         <%= render "shared/search_form", placeholder: "Search notices..." %>
       <% end %>
       
-      <%= button_tag "Search", type: "button", class: "btn btn-outline btn-search", data: { controller: "dropdown", action: "click->dropdown#toggle" } do %>
+      <%= button_tag type: "button", class: "btn btn-outline btn-search", data: { controller: "dropdown", action: "click->dropdown#toggle" } do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M9.75 9.75a4.5 4.5 0 110-9 4.5 4.5 0 010 9z" /></svg>
       <% end %>
       
@@ -19,35 +19,35 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5h6M9 11h6M9 17h6" /></svg>
         </div>
         <ul tabindex="0" class="menu dropdown-content z-[1] mt-3 w-52 p-2 shadow bg-base-100 rounded-box" id="notice-filters-dropdown">
-          <li><%= link_to "All Notices", notices_path, class: "flex items-center space-x-2" do %>
+          <li><%= link_to notices_path, class: "flex items-center space-x-2" do %>
               <span>All</span>
               <% if params[:priority].blank? && params[:target_audience].blank? %>
                 <span class="badge badge-secondary ml-auto">active</span>
               <% end %>
             <% end %>
           </li>
-          <li><%= link_to "Urgent Notices", notices_path(priority: :urgent), class: "flex items-center space-x-2" do %>
+          <li><%= link_to notices_path(priority: :urgent), class: "flex items-center space-x-2" do %>
               <span>Urgent</span>
               <% if params[:priority] == "urgent" %>
                 <span class="badge badge-secondary ml-auto">active</span>
               <% end %>
             <% end %>
           </li>
-          <li><%= link_to "For Teachers", notices_path(target_audience: :teachers), class: "flex items-center space-x-2" do %>
+          <li><%= link_to notices_path(target_audience: :teachers), class: "flex items-center space-x-2" do %>
               <span>Teachers</span>
               <% if params[:target_audience] == "teachers" %>
                 <span class="badge badge-secondary ml-auto">active</span>
               <% end %>
             <% end %>
           </li>
-          <li><%= link_to "For Parents", notices_path(target_audience: :parents), class: "flex items-center space-x-2" do %>
+          <li><%= link_to notices_path(target_audience: :parents), class: "flex items-center space-x-2" do %>
               <span>Parents</span>
               <% if params[:target_audience] == "parents" %>
                 <span class="badge badge-secondary ml-auto">active</span>
               <% end %>
             <% end %>
           </li>
-          <li><%= link_to "For Students", notices_path(target_audience: :students), class: "flex items-center space-x-2" do %>
+          <li><%= link_to notices_path(target_audience: :students), class: "flex items-center space-x-2" do %>
               <span>Students</span>
               <% if params[:target_audience] == "students" %>
                 <span class="badge badge-secondary ml-auto">active</span>
@@ -61,7 +61,7 @@
 
   <div class="flex justify-between items-center mb-4">
     <span class="text-sm text-muted-foreground">
-      <span data-notice-count-target>0</span> notices
+      <span id="notice-count"><%= @notices.count %></span> notices
     </span>
     <% if current_user.admin? || current_user.teacher? %>
       <%= link_to "Mark All as Read", "#", class: "btn btn-sm btn-outline", data: { action: "click->notice#markAllAsRead" } %>

@@ -1,0 +1,50 @@
+<div data-transport-route-id="<%= transport_route.id %>" class="card bg-base-100 shadow-xl mb-4">
+  <div class="card-body">
+    <div class="flex justify-between items-start mb-2">
+      <h3 class="card-title text-lg font-semibold"><%= transport_route.name %></h3>
+      <div class="flex items-center space-x-2">
+        <%= badge_tag transport_route.route_code, variant: "info", class: "badge" %>
+        <%= badge_tag transport_route.area, variant: "secondary", class: "badge" %>
+        <%= badge_tag "#{number_to_percentage(transport_route.occupancy_rate, precision: 0)} Full", 
+                      variant: transport_route.full? ? "error" : transport_route.near_full? ? "warning" : "success",
+                      class: "badge" %>
+      </div>
+    </div>
+    
+    <div class="space-y-2">
+      <div class="flex items-center">
+        <span class="font-medium">Bus:</span>
+        <span class="ml-auto"><%= transport_route.bus ? transport_route.bus.bus_number : "Not Assigned" %></span>
+      </div>
+      <div class="flex items-center">
+        <span class="font-medium">Distance:</span>
+        <span class="ml-auto"><%= number_with_precision(transport_route.distance_km, precision: 1) %> km</span>
+      </div>
+      <div class="flex items-center">
+        <span class="font-medium">Monthly Fee:</span>
+        <span class="ml-auto"><%= number_to_currency(transport_route.monthly_fee) %></span>
+      </div>
+      <div class="flex items-center">
+        <span class="font-medium">Pickup Time:</span>
+        <span class="ml-auto"><%= transport_route.pickup_time.strftime("%I:%M %p") if transport_route.pickup_time %></span>
+      </div>
+      <div class="flex items-center">
+        <span class="font-medium">Dropoff Time:</span>
+        <span class="ml-auto"><%= transport_route.dropoff_time.strftime("%I:%M %p") if transport_route.dropoff_time %></span>
+      </div>
+      <div class="flex items-center">
+        <span class="font-medium">Stops:</span>
+        <span class="ml-auto"><%= transport_route.stops.join(", ") if transport_route.stops.present? %></span>
+      </div>
+    </div>
+    
+    <div class="card-actions justify-end mt-4">
+      <%= link_to "Details", transport_route_path(transport_route), class: "btn btn-sm btn-outline" %>
+      <%= link_to "Edit", edit_transport_route_path(transport_route), class: "btn btn-sm btn-outline" %>
+      <%= button_to "Delete", transport_route_path(transport_route), 
+                    method: :delete,
+                    data: { turbo_confirm: "Are you sure you want to delete this transport route?" },
+                    class: "btn btn-sm btn-error" %>
+    </div>
+  </div>
+</div>

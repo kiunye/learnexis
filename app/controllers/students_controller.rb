@@ -13,7 +13,7 @@ class StudentsController < ApplicationController
       search_term = "%#{params[:search]}%"
       students_scope = students_scope.joins(:user)
                                      .where(
-                                       "users.first_name ILIKE ? OR users.last_name ILIKE ? OR students.admission_number ILIKE ?",
+                                       "users.first_name LIKE ? OR users.last_name LIKE ? OR students.admission_number LIKE ?",
                                        search_term, search_term, search_term
                                      )
     end

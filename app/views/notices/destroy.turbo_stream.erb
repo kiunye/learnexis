@@ -1,0 +1,7 @@
+<%= turbo_stream.remove @notice %>
+<%= turbo_stream.update "notice-count" do %>
+  <%= @notices.count %>
+<% end %>
+<%= turbo_stream.update "flash" do %>
+  <%= render partial: "shared/flash", locals: { flash: flash } %>
+<% end %>

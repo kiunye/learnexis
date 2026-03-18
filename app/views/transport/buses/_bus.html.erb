@@ -1,0 +1,50 @@
+<div data-bus-id="<%= bus.id %>" class="card bg-base-100 shadow-xl mb-4">
+  <div class="card-body">
+    <div class="flex justify-between items-start mb-2">
+      <h3 class="card-title text-lg font-semibold"><%= bus.bus_number %></h3>
+      <div class="flex items-center space-x-2">
+        <%= badge_tag bus.registration_number, variant: "info", class: "badge" %>
+        <%= badge_tag "Capacity: #{bus.capacity}", variant: "secondary", class: "badge" %>
+        <%= badge_tag bus.active? ? "Active" : "Inactive", 
+                      variant: bus.active? ? "success" : "error",
+                      class: "badge" %>
+      </div>
+    </div>
+    
+    <div class="space-y-2">
+      <div class="flex items-center">
+        <span class="font-medium">Driver Name:</span>
+        <span class="ml-auto"><%= bus.driver_name %></span>
+      </div>
+      <div class="flex items-center">
+        <span class="font-medium">Driver Phone:</span>
+        <span class="ml-auto"><%= bus.driver_phone %></span>
+      </div>
+      <div class="flex items-center">
+        <span class="font-medium">Driver License:</span>
+        <span class="ml-auto"><%= bus.driver_license_number %></span>
+      </div>
+      <div class="flex items-center">
+        <span class="font-medium">Insurance Expiry:</span>
+        <span class="ml-auto"><%= l(bus.insurance_expiry, format: :short) if bus.insurance_expiry %></span>
+      </div>
+      <div class="flex items-center">
+        <span class="font-medium">Last Maintenance:</span>
+        <span class="ml-auto"><%= l(bus.last_maintenance_date, format: :short) if bus.last_maintenance_date %></span>
+      </div>
+      <div class="flex items-center">
+        <span class="font-medium">Next Maintenance:</span>
+        <span class="ml-auto"><%= l(bus.next_maintenance_date, format: :short) if bus.next_maintenance_date %></span>
+      </div>
+    </div>
+    
+    <div class="card-actions justify-end mt-4">
+      <%= link_to "Details", transport_bus_path(bus), class: "btn btn-sm btn-outline" %>
+      <%= link_to "Edit", edit_transport_bus_path(bus), class: "btn btn-sm btn-outline" %>
+      <%= button_to "Delete", transport_bus_path(bus), 
+                    method: :delete,
+                    data: { turbo_confirm: "Are you sure you want to delete this bus?" },
+                    class: "btn btn-sm btn-error" %>
+    </div>
+  </div>
+</div>

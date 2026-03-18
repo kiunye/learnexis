@@ -1,0 +1,76 @@
+<%= form_with model: @bus, url: @bus.persisted? ? transport_bus_path(@bus) : transport_buses_path, class: "space-y-4" do |form| %>
+  <% if @bus.errors.any? %>
+    <div class="alert alert-error">
+      <span><%= pluralize(@bus.errors.count, "error") %> prohibited this bus from being saved:</span>
+      <ul>
+        <% @bus.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label"><span class="label-text">Bus Number</span></label>
+      <%= form.text_field :bus_number, class: "input input-bordered w-full", required: true %>
+    </div>
+
+    <div class="form-control">
+      <label class="label"><span class="label-text">Registration Number</span></label>
+      <%= form.text_field :registration_number, class: "input input-bordered w-full" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label"><span class="label-text">Capacity</span></label>
+      <%= form.number_field :capacity, min: 0, class: "input input-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <label class="label"><span class="label-text">Active</span></label>
+      <div class="mt-2">
+        <%= form.check_box :active, class: "checkbox checkbox-primary" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label"><span class="label-text">Driver Name</span></label>
+      <%= form.text_field :driver_name, class: "input input-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <label class="label"><span class="label-text">Driver Phone</span></label>
+      <%= form.text_field :driver_phone, class: "input input-bordered w-full" %>
+    </div>
+  </div>
+
+  <div class="form-control">
+    <label class="label"><span class="label-text">Driver License Number</span></label>
+    <%= form.text_field :driver_license_number, class: "input input-bordered w-full" %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="form-control">
+      <label class="label"><span class="label-text">Insurance Expiry</span></label>
+      <%= form.date_field :insurance_expiry, class: "input input-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <label class="label"><span class="label-text">Last Maintenance</span></label>
+      <%= form.date_field :last_maintenance_date, class: "input input-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <label class="label"><span class="label-text">Next Maintenance</span></label>
+      <%= form.date_field :next_maintenance_date, class: "input input-bordered w-full" %>
+    </div>
+  </div>
+
+  <div class="form-control mt-6">
+    <%= form.submit class: "btn btn-primary w-full" %>
+  </div>
+<% end %>

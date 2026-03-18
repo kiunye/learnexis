@@ -9,6 +9,10 @@ class NoticePolicy < ApplicationPolicy
     true
   end
 
+  def search?
+    index?
+  end
+
   def create?
     admin? || teacher?
   end

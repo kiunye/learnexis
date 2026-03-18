@@ -1,5 +1,12 @@
 #!/usr/bin/env ruby
 require_relative "../config/boot"
+require "fileutils"
+
+project_root = File.expand_path("..", __dir__)
+advisory_db_path = File.join(project_root, "vendor", "ruby-advisory-db")
+FileUtils.mkdir_p(advisory_db_path)
+ENV["BUNDLER_AUDIT_DB"] = advisory_db_path
+
 require "bundler/audit/cli"
 
 ARGV.concat %w[ --config config/bundler-audit.yml ] if ARGV.empty? || ARGV.include?("check")

@@ -1,24 +1,11 @@
 class NoticesController < ApplicationController
-  before_action :authenticate_user!
   before_action :set_notice, only: %i[show edit update destroy]
   before_action :authorize_notice
   include NoticeUpdates
 
   # GET /notices or /notices.json
   def index
-    @notices = Notice.active.for_role(current_user.role)
-
-    # Apply filters
-    @notices = @notices.where(priority: params[:priority]) if params[:priority].present?
-    @notices = @notices.where(target_audience: params[:target_audience]) if params[:target_audience].present?
-
-    # Search functionality
-    if params[:query].present?
-      search_term = "%#{params[:query]}%"
-      @notices = @notices.where("title ILIKE ? OR content ILIKE ?", search_term, search_term)
-    end
-
-    @notices = @notices.order(published_at: :desc)
+    @notices = filtered_notices
   end
 
   # GET /notices/1 or /notices/1.json
@@ -39,32 +26,22 @@ class NoticesController < ApplicationController
     @notice = Notice.new(notice_params)
     @notice.author = current_user
 
-    respond_to do |format|
-      if @notice.save
-        format.html { redirect_to notice_url(@notice), notice: "Notice was successfully created." }
-        format.json { render :show, status: :created, location: @notice }
-        format.turbo_stream { flash.now[:notice] = "Notice was successfully created." }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @notice.errors, status: :unprocessable_entity }
-        format.turbo_stream { render :form_update, status: :unprocessable_entity }
-      end
-    end
+    respond_with_notice_save(
+      ok: @notice.save,
+      ok_status: :created,
+      ok_notice: "Notice was successfully created.",
+      error_template: :new
+    )
   end
 
   # PATCH/PUT /notices/1 or /notices/1.json
   def update
-    respond_to do |format|
-      if @notice.update(notice_params)
-        format.html { redirect_to notice_url(@notice), notice: "Notice was successfully updated." }
-        format.json { render :show, status: :ok, location: @notice }
-        format.turbo_stream { flash.now[:notice] = "Notice was successfully updated." }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @notice.errors, status: :unprocessable_entity }
-        format.turbo_stream { render :form_update, status: :unprocessable_entity }
-      end
-    end
+    respond_with_notice_save(
+      ok: @notice.update(notice_params),
+      ok_status: :ok,
+      ok_notice: "Notice was successfully updated.",
+      error_template: :edit
+    )
   end
 
   # DELETE /notices/1 or /notices/1.json
@@ -80,19 +57,7 @@ class NoticesController < ApplicationController
 
   # GET /notices/search
   def search
-    @notices = Notice.active.for_role(current_user.role)
-
-    # Apply filters
-    @notices = @notices.where(priority: params[:priority]) if params[:priority].present?
-    @notices = @notices.where(target_audience: params[:target_audience]) if params[:target_audience].present?
-
-    # Search functionality
-    if params[:query].present?
-      search_term = "%#{params[:query]}%"
-      @notices = @notices.where("title ILIKE ? OR content ILIKE ?", search_term, search_term)
-    end
-
-    @notices = @notices.order(published_at: :desc)
+    @notices = filtered_notices
 
     render partial: "notices/notice", collection: @notices, as: :notice
   end
@@ -111,5 +76,32 @@ class NoticesController < ApplicationController
     # Authorization using Pundit
     def authorize_notice
       authorize Notice
+    end
+
+    def filtered_notices
+      scope = Notice.active.for_role(current_user.role)
+      scope = scope.where(priority: params[:priority]) if params[:priority].present?
+      scope = scope.where(target_audience: params[:target_audience]) if params[:target_audience].present?
+
+      if params[:query].present?
+        search_term = "%#{params[:query]}%"
+        scope = scope.where("title LIKE ? OR content LIKE ?", search_term, search_term)
+      end
+
+      scope.order(published_at: :desc)
+    end
+
+    def respond_with_notice_save(ok:, ok_status:, ok_notice:, error_template:)
+      respond_to do |format|
+        if ok
+          format.html { redirect_to notice_url(@notice), notice: ok_notice }
+          format.json { render :show, status: ok_status, location: @notice }
+          format.turbo_stream
+        else
+          format.html { render error_template, status: :unprocessable_entity }
+          format.json { render json: @notice.errors, status: :unprocessable_entity }
+          format.turbo_stream { render :form_update, status: :unprocessable_entity }
+        end
+      end
     end
 end

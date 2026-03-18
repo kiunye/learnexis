@@ -16,6 +16,10 @@ Rails.application.routes.draw do
     member do
       get :download
     end
+    collection do
+      post :mpesa_callback
+      get :verify_mpesa
+    end
   end
 
   # Invoices
@@ -42,6 +46,37 @@ Rails.application.routes.draw do
     collection do
       get :search
     end
+  end
+
+  # Events
+  resources :events do
+    member do
+      post :register
+      delete :unregister
+      get :attendees
+    end
+    collection do
+      get :search
+    end
+  end
+
+  # Reports
+  resources :reports do
+    collection do
+      get :financial
+      get :attendance
+      get :transport
+      get :export
+    end
+  end
+
+  # Transport
+  namespace :transport do
+    resources :routes, only: [ :index, :new, :create, :edit, :update, :destroy ]
+    resources :buses, only: [ :index, :new, :create, :edit, :update, :destroy ]
+    get "assignments", to: "transport#assignments"
+    post "assignments/:student_id/assign", to: "transport#assign_student", as: :assign_student
+    delete "assignments/:student_id/unassign", to: "transport#unassign_student", as: :unassign_student
   end
 
   # Classrooms

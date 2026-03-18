@@ -8,6 +8,7 @@ class Student < ApplicationRecord
   has_many :fees, through: :fee_assignments
   has_many :invoices, dependent: :destroy
   has_many :transactions, dependent: :nullify
+  belongs_to :transport_route, optional: true
 
   has_one_attached :photo
 

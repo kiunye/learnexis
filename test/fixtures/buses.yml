@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  bus_number: MyString
+  registration_number: MyString
+  capacity: 1
+  driver_name: MyString
+  driver_phone: MyString
+  driver_license_number: MyString
+  insurance_expiry: 2026-03-17
+  last_maintenance_date: 2026-03-17
+  next_maintenance_date: 2026-03-17
+  active: false
+
+two:
+  bus_number: MyString
+  registration_number: MyString
+  capacity: 1
+  driver_name: MyString
+  driver_phone: MyString
+  driver_license_number: MyString
+  insurance_expiry: 2026-03-17
+  last_maintenance_date: 2026-03-17
+  next_maintenance_date: 2026-03-17
+  active: false

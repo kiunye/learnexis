@@ -25,6 +25,18 @@ class EventPolicy < ApplicationPolicy
     true # All authenticated users can register for events (subject to audience rules)
   end
 
+  def unregister?
+    register?
+  end
+
+  def attendees?
+    show?
+  end
+
+  def search?
+    index?
+  end
+
   class Scope < ApplicationPolicy::Scope
     def resolve
       # All authenticated users can see events (filtered by audience in model)

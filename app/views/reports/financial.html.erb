@@ -1,0 +1,143 @@
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">Financial Report</h2>
+    <div class="flex items-center space-x-4">
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-sm btn-circle btn-outline" data-dropdown-toggle="report-format-dropdown">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5h6M9 11h6M9 17h6" /></svg>
+        </div>
+        <ul tabindex="0" class="menu dropdown-content z-[1] mt-3 w-52 p-2 shadow bg-base-100 rounded-box">
+          <li><%= link_to financial_reports_path(format: :csv), class: "flex items-center space-x-2" do %>
+              <span>CSV</span>
+              <% if params[:format] == "csv" %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+          <li><%= link_to financial_reports_path(format: :pdf), class: "flex items-center space-x-2" do %>
+              <span>PDF</span>
+              <% if params[:format] == "pdf" %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+        </ul>
+      </div>
+      
+      <%= button_tag type: "button", class: "btn btn-outline btn-search", data: { controller: "dropdown", action: "click->dropdown#toggle" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M9.75 9.75a4.5 4.5 0 110-9 4.5 4.5 0 010 9z" /></svg>
+      <% end %>
+      
+      <div class="dropdown dropdown-end z-[1]">
+        <div tabindex="0" role="button" class="btn btn-sm btn-circle btn-outline" data-dropdown-toggle="report-filters-dropdown">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5h6M9 11h6M9 17h6" /></svg>
+        </div>
+        <ul tabindex="0" class="menu dropdown-content z-[1] mt-3 w-52 p-2 shadow bg-base-100 rounded-box" id="report-filters-dropdown">
+          <li>
+            <div class="form-control w-52">
+              <label class="label">
+                <span class="label-text">Start Date</span>
+              </label>
+              <%= date_field_tag :start_date, params[:start_date] || 1.month.ago.beginning_of_month.to_s, class: "input input-bordered w-full" %>
+            </div>
+          </li>
+          <li>
+            <div class="form-control w-52">
+              <label class="label">
+                <span class="label-text">End Date</span>
+              </label>
+              <%= date_field_tag :end_date, params[:end_date] || Date.today.end_of_month.to_s, class: "input input-bordered w-full" %>
+            </div>
+          </li>
+          <li><%= button_tag "Apply Filter", class: "btn btn-primary w-full mt-2", type: "button", data: { action: "click->report#applyFilter" } %>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="stat-title text-gray-600">Total Income</div>
+          <div class="stat-value text-success"><%= number_to_currency(@total_income) %></div>
+          <div class="stat-desc text-gray-600">From <%= @start_date.strftime("%b %d, %Y") %> to <%= @end_date.strftime("%b %d, %Y") %></div>
+        </div>
+      </div>
+      
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="stat-title text-gray-600">Total Expenses</div>
+          <div class="stat-value text-error"><%= number_to_currency(@total_expenses) %></div>
+          <div class="stat-desc text-gray-600">From <%= @start_date.strftime("%b %d, %Y") %> to <%= @end_date.strftime("%b %d, %Y") %></div>
+        </div>
+      </div>
+      
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="stat-title text-gray-600">Net Income</div>
+          <div class="stat-value <%= @net_income >= 0 ? "text-success" : "text-error" %>"><%= number_to_currency(@net_income) %></div>
+          <div class="stat-desc text-gray-600">Income minus expenses</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Income by Payment Method -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="card-title text-lg font-semibold">Income by Payment Method</h3>
+        </div>
+        <% if @income_by_method.any? %>
+          <div class="space-y-2">
+            <% @income_by_method.each do |method, amount| %>
+              <div class="flex justify-between items-center">
+                <span><%= method.to_s.titleize %></span>
+                <span class="badge badge-success"><%= number_to_currency(amount) %></span>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-muted-foreground">No income records found for the selected period.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Monthly Trend -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="card-title text-lg font-semibold">Monthly Trend (Last 6 Months)</h3>
+        </div>
+        <% if @monthly_trend.any? %>
+          <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th class="text-right">Income</th>
+                  <th class="text-right">Expense</th>
+                  <th class="text-right">Net</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @monthly_trend.each do |month| %>
+                  <tr>
+                    <td><%= month[:month] %></td>
+                    <td class="text-right"><%= number_to_currency(month[:income]) %></td>
+                    <td class="text-right"><%= number_to_currency(month[:expense]) %></td>
+                    <td class="text-right <%= month[:net] >= 0 ? "text-success" : "text-error" %>"><%= number_to_currency(month[:net]) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-muted-foreground">No financial data available for the trend analysis.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

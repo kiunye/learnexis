@@ -23,6 +23,10 @@ class InvoicePolicy < ApplicationPolicy
     admin?
   end
 
+  def create_bulk?
+    bulk_generate?
+  end
+
   def download?
     show?
   end

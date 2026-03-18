@@ -1,0 +1,62 @@
+<div data-event-id="<%= event.id %>" class="card bg-base-100 shadow-xl mb-4">
+  <div class="card-body">
+    <div class="flex justify-between items-start mb-2">
+      <h3 class="card-title text-lg font-semibold"><%= event.title %></h3>
+      <div class="flex items-center space-x-2">
+        <%= badge_tag event.event_type.titleize, variant: "info", class: "badge" %>
+        <% if event.registration_required? %>
+          <%= badge_tag "Registration Required", variant: "warning", class: "badge" %>
+        <% end %>
+      </div>
+    </div>
+    
+    <p class="text-preline mb-4"><%= truncate(event.content || event.description, length: 150) %></p>
+    
+    <div class="flex justify-between items-center text-sm text-muted-foreground">
+      <div>
+        <span>By: <%= event.organizer&.full_name || "Unknown" %></span>
+        <span class="mx-2">•</span>
+        <span><%= l(event.start_datetime, format: :short) if event.start_datetime %></span>
+      </div>
+      
+      <% if event.max_participants.present? %>
+        <div>
+          <span class="badge <%= event.event_registrations.count >= event.max_participants ? "badge-error" : "badge-outline" %>">
+            <%= event.event_registrations.count %>/<%= event.max_participants %> registered
+          </span>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="card-actions justify-end mt-4">
+      <% if policy(event).show? %>
+        <%= link_to "Details", event_path(event), class: "btn btn-sm btn-outline" %>
+      <% end %>
+      
+      <% if policy(event).update? %>
+        <%= link_to "Edit", edit_event_path(event), class: "btn btn-sm btn-outline" %>
+      <% end %>
+      
+      <% if policy(event).destroy? %>
+        <%= button_to "Delete", event_path(event), 
+                      method: :delete,
+                      data: { turbo_confirm: "Are you sure you want to delete this event?" },
+                      class: "btn btn-sm btn-error" %>
+      <% end %>
+      
+      <% if current_user.present? && event.organizer != current_user %>
+        <% if @event_registration.present? %>
+          <%= button_to "Unregister", unregister_event_path(event), 
+                        method: :delete,
+                        class: "btn btn-sm btn-error" %>
+        <% elsif !event.registration_required? || (event.max_participants.present? && event.event_registrations.count < event.max_participants) %>
+          <%= button_to "Register", register_event_path(event), 
+                        method: :post,
+                        class: "btn btn-sm btn-primary" %>
+        <% else %>
+          <span class="btn btn-sm btn-outline">Event Full</span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

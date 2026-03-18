@@ -1,0 +1,104 @@
+<div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold"><%= @event.title %></h1>
+    
+    <div class="flex items-center space-x-4 mt-2">
+      <%= badge_tag @event.event_type.titleize, variant: "info", class: "badge" %>
+      <% if @event.registration_required? %>
+        <%= badge_tag "Registration Required", variant: "warning", class: "badge" %>
+      <% end %>
+    </div>
+    
+    <p class="mt-4"><%= simple_format(@event.description) %></p>
+    
+    <div class="grid grid-cols-1 gap-4 mt-6 sm:grid-cols-2">
+      <div class="card bg-base-100">
+        <div class="card-body">
+          <h3 class="card-title font-bold">Event Details</h3>
+          <div class="space-y-2">
+            <div class="flex items-center">
+              <span class="font-medium">Start Time:</span>
+              <span class="ml-auto"><%= l(@event.start_datetime, format: :long) if @event.start_datetime %></span>
+            </div>
+            <div class="flex items-center">
+              <span class="font-medium">End Time:</span>
+              <span class="ml-auto"><%= l(@event.end_datetime, format: :long) if @event.end_datetime %></span>
+            </div>
+            <div class="flex items-center">
+              <span class="font-medium">Location:</span>
+              <span class="ml-auto"><%= @event.location %></span>
+            </div>
+            <div class="flex items-center">
+              <span class="font-medium">Organizer:</span>
+              <span class="ml-auto"><%= @event.organizer&.full_name || "Unknown" %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <% if @event.max_participants.present? %>
+      <div class="card bg-base-100">
+        <div class="card-body">
+          <h3 class="card-title font-bold">Registration Status</h3>
+          <div class="space-y-2">
+            <div class="flex items-center">
+              <span class="font-medium">Registered:</span>
+              <span class="ml-auto"><%= @event.event_registrations.count %></span>
+            </div>
+            <div class="flex items-center">
+              <span class="font-medium">Capacity:</span>
+              <span class="ml-auto"><%= @event.max_participants %></span>
+            </div>
+            <div class="flex items-center">
+              <span class="font-medium">Available:</span>
+              <span class="ml-auto"><%= [0, @event.max_participants - @event.event_registrations.count].max %></span>
+            </div>
+            <div class="flex items-center">
+              <span class="font-medium">Status:</span>
+              <span class="ml-auto">
+                <% if @event.event_registrations.count >= @event.max_participants %>
+                  <span class="badge badge-error">Full</span>
+                <% elsif @event.event_registrations.count == 0 %>
+                  <span class="badge badge-secondary">Open</span>
+                <% else %>
+                  <span class="badge badge-warning">Limited Spots</span>
+                <% end %>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% end %>
+    </div>
+    
+    <% if current_user.present? && @event.organizer != current_user %>
+      <div class="mt-6">
+        <% if @event_registration.present? %>
+          <%= button_to "Unregister", unregister_event_path(@event), 
+                        method: :delete,
+                        class: "btn btn-error" %>
+        <% elsif !@event.registration_required? || (@event.max_participants.present? && @event.event_registrations.count < @event.max_participants) %>
+          <%= button_to "Register", register_event_path(@event), 
+                        method: :post,
+                        class: "btn btn-primary" %>
+        <% else %>
+          <button class="btn btn-outline" disabled>Event Full</button>
+        <% end %>
+      </div>
+    <% end %>
+    
+    <% if policy(@event).update? || policy(@event).destroy? %>
+      <div class="mt-6 flex justify-end space-x-3">
+        <% if policy(@event).update? %>
+          <%= link_to "Edit", edit_event_path(@event), class: "btn btn-outline" %>
+        <% end %>
+        <% if policy(@event).destroy? %>
+          <%= button_to "Delete", @event, 
+                        method: :delete,
+                        data: { turbo_confirm: "Are you sure you want to delete this event?" },
+                        class: "btn btn-error" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

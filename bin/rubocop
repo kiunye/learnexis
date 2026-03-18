@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
 require "rubygems"
 require "bundler/setup"
+require "fileutils"
+
+ENV["RUBOCOP_CACHE_ROOT"] ||= File.expand_path("../tmp/rubocop", __dir__)
+FileUtils.mkdir_p(ENV["RUBOCOP_CACHE_ROOT"])
 
 # Explicit RuboCop config increases performance slightly while avoiding config confusion.
 ARGV.unshift("--config", File.expand_path("../.rubocop.yml", __dir__))

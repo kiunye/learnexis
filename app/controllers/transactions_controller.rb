@@ -79,13 +79,58 @@ class TransactionsController < ApplicationController
     end
   end
 
-  def destroy
-    if @transaction.destroy
-      redirect_to transactions_path, notice: "Transaction deleted successfully."
-    else
-      redirect_to transaction_path(@transaction), alert: "Failed to delete transaction."
+    def destroy
+      if @transaction.destroy
+        redirect_to transactions_path, notice: "Transaction deleted successfully."
+      else
+        redirect_to transaction_path(@transaction), alert: "Failed to delete transaction."
+      end
     end
-  end
+
+    # M-Pesa Callback
+    def mpesa_callback
+      # In production, this would be a webhook endpoint for M-Pesa provider
+      # For now, we'll simulate handling the callback
+
+      callback_data = params.except(:controller, :action, :format).to_unsafe_h
+
+      # Process the callback through our service
+      result = MpesaPaymentService.process_callback(callback_data)
+
+      if result[:success] && result[:data].present?
+        # Record the transaction
+        transaction = MpesaPaymentService.record_transaction(result[:data])
+
+        if transaction.present?
+          # Send confirmation SMS/SMS to parents
+          # SmsService.send_payment_confirmation(transaction) # Would implement this
+
+          render json: { success: true, message: "M-Pesa payment processed successfully" }, status: :ok
+        else
+          render json: { success: false, error: "Failed to record transaction" }, status: :unprocessable_entity
+        end
+      else
+        render json: { success: false, error: result[:error] || "Invalid callback data" }, status: :unprocessable_entity
+      end
+    end
+
+    # Verify M-Pesa transaction status
+    def verify_mpesa
+      reference = params[:reference]
+
+      if reference.blank?
+        render json: { success: false, error: "Reference is required" }, status: :bad_request
+        return
+      end
+
+      result = MpesaPaymentService.query_transaction_status(reference)
+
+      if result[:success]
+        render json: { success: true, data: result[:data] }, status: :ok
+      else
+        render json: { success: false, error: result[:error] }, status: :unprocessable_entity
+      end
+    end
 
   def download
     pdf = ReceiptPdfService.build(@transaction)

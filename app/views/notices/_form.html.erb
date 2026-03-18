@@ -71,7 +71,7 @@
       <label class="label">
         <span class="label-text">Published At</span>
       </label>
-      <%= form.datetime_local :published_at, 
+      <%= form.datetime_local_field :published_at,
                              class: "input input-bordered w-full", 
                              value: notice.published_at || Time.current %>
     </div>
@@ -80,7 +80,7 @@
       <label class="label">
         <span class="label-text">Expires At</span>
       </label>
-      <%= form.datetime_local :expires_at, 
+      <%= form.datetime_local_field :expires_at,
                              class: "input input-bordered w-full" %>
     </div>
   </div>

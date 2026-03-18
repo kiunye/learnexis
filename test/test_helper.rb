@@ -1,4 +1,14 @@
 ENV["RAILS_ENV"] ||= "test"
+
+if ENV["COVERAGE"] == "true"
+  require "simplecov"
+
+  SimpleCov.start "rails" do
+    enable_coverage :branch
+    add_filter %r{\A/bin/}
+  end
+end
+
 require_relative "../config/environment"
 require "rails/test_help"
 require_relative "test_helpers/session_test_helper"

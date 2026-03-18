@@ -1,0 +1,106 @@
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">Transport Report</h2>
+    <div class="flex items-center space-x-4">
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-sm btn-circle btn-outline" data-dropdown-toggle="report-format-dropdown">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5h6M9 11h6M9 17h6" /></svg>
+        </div>
+        <ul tabindex="0" class="menu dropdown-content z-[1] mt-3 w-52 p-2 shadow bg-base-100 rounded-box">
+          <li><%= link_to transport_reports_path(format: :csv), class: "flex items-center space-x-2" do %>
+              <span>CSV</span>
+              <% if params[:format] == "csv" %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+          <li><%= link_to transport_reports_path(format: :pdf), class: "flex items-center space-x-2" do %>
+              <span>PDF</span>
+              <% if params[:format] == "pdf" %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="stat-title text-gray-600">Total Students Assigned</div>
+          <div class="stat-value text-primary"><%= @total_students_assigned %></div>
+          <div class="stat-desc text-gray-600">Currently assigned to routes</div>
+        </div>
+      </div>
+      
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="stat-title text-gray-600">Total Capacity</div>
+          <div class="stat-value text-primary"><%= @total_capacity %></div>
+          <div class="stat-desc text-gray-600">Across all buses</div>
+        </div>
+      </div>
+      
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="stat-title text-gray-600">Overall Occupancy</div>
+          <div class="stat-value <%= @overall_occupancy >= 80 ? "text-warning" : @overall_occupancy >= 95 ? "text-error" : "text-success" %>"><%= number_with_precision(@overall_occupancy, precision: 1) %>%</div>
+          <div class="stat-desc text-gray-600">Average route occupancy</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transport Details -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="card-title text-lg font-semibold">Route Details</h3>
+        </div>
+        <% if @transport_data.any? %>
+          <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+              <thead>
+                <tr>
+                  <th>Route Name</th>
+                  <th>Route Code</th>
+                  <th>Area</th>
+                  <th>Bus</th>
+                  <th class="text-center">Students</th>
+                  <th class="text-center">Capacity</th>
+                  <th class="text-center">Occupancy</th>
+                  <th class="text-center">Monthly Revenue</th>
+                  <th class="text-center">Available Seats</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @transport_data.each do |data| %>
+                  <tr>
+                    <td><%= data[:route].name %></td>
+                    <td><%= data[:route].route_code %></td>
+                    <td><%= data[:route].area %></td>
+                    <td><%= data[:route].bus&.bus_number || "Not Assigned" %></td>
+                    <td class="text-center"><%= data[:student_count] %></td>
+                    <td class="text-center"><%= data[:capacity] %></td>
+                    <td class="text-center">
+                      <span class="badge <%= data[:route].full? ? "badge-error" : data[:route].near_full? ? "badge-warning" : "badge-success" %>">
+                        <%= number_with_precision(data[:occupancy_rate], precision: 1) %>%
+                      </span>
+                    </td>
+                    <td class="text-center"><%= number_to_currency(data[:monthly_revenue]) %></td>
+                    <td class="text-center"><%= data[:available_seats] %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-muted-foreground">No transport routes found.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

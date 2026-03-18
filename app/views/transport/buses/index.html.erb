@@ -1,0 +1,52 @@
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8" data-controller="transport">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">Buses</h2>
+    <div class="flex items-center space-x-4">
+      <%= link_to "New Bus", new_transport_bus_path, class: "btn btn-primary" %>
+
+      <%= button_tag type: "button", class: "btn btn-outline btn-search", data: { controller: "dropdown", action: "click->dropdown#toggle" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M9.75 9.75a4.5 4.5 0 110-9 4.5 4.5 0 010 9z" /></svg>
+      <% end %>
+      
+      <div class="dropdown dropdown-end z-[1]">
+        <div tabindex="0" role="button" class="btn btn-sm btn-circle btn-outline" data-dropdown-toggle="transport-buses-filters-dropdown">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5h6M9 11h6M9 17h6" /></svg>
+        </div>
+        <ul tabindex="0" class="menu dropdown-content z-[1] mt-3 w-52 p-2 shadow bg-base-100 rounded-box" id="transport-buses-filters-dropdown">
+          <li><%= link_to transport_buses_path, class: "flex items-center space-x-2" do %>
+              <span>All</span>
+              <% if params[:active].blank? && params[:query].blank? %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+          <li>
+            <div class="flex items-center space-x-2">
+              <span>Active Buses</span>
+              <%= check_box_tag :active, "true", params[:active] == "true", class: "checkbox checkbox-primary", data: { action: "change->transport#filterByActive" } %>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-between items-center mb-4">
+    <span class="text-sm text-muted-foreground">
+      <span id="transport-buses-count"><%= @buses.count %></span> buses
+    </span>
+  </div>
+
+  <% if @buses.any? %>
+    <div id="transport-buses-list" data-transport-buses-list-target class="space-y-4">
+      <% @buses.each do |bus| %>
+        <%= render bus %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-12">
+      <p class="text-muted-foreground">No buses found.</p>
+      <%= link_to "Create First Bus", new_transport_bus_path, class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

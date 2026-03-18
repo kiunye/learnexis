@@ -1,0 +1,72 @@
+<%= form_with model: @transport_route, url: @transport_route.persisted? ? transport_route_path(@transport_route) : transport_routes_path, class: "space-y-4" do |form| %>
+  <% if @transport_route.errors.any? %>
+    <div class="alert alert-error">
+      <span><%= pluralize(@transport_route.errors.count, "error") %> prohibited this route from being saved:</span>
+      <ul>
+        <% @transport_route.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label"><span class="label-text">Name</span></label>
+      <%= form.text_field :name, class: "input input-bordered w-full", required: true %>
+    </div>
+
+    <div class="form-control">
+      <label class="label"><span class="label-text">Route Code</span></label>
+      <%= form.text_field :route_code, class: "input input-bordered w-full", required: true %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label"><span class="label-text">Area</span></label>
+      <%= form.select :area, %w[North South East West], { include_blank: "Select area" }, class: "select select-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <label class="label"><span class="label-text">Monthly Fee</span></label>
+      <%= form.number_field :monthly_fee, step: "0.01", min: 0, class: "input input-bordered w-full", required: true %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label"><span class="label-text">Pickup Time</span></label>
+      <%= form.time_field :pickup_time, class: "input input-bordered w-full", required: true %>
+    </div>
+
+    <div class="form-control">
+      <label class="label"><span class="label-text">Dropoff Time</span></label>
+      <%= form.time_field :dropoff_time, class: "input input-bordered w-full", required: true %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label"><span class="label-text">Distance (km)</span></label>
+      <%= form.number_field :distance_km, step: "0.1", min: 0, class: "input input-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <label class="label"><span class="label-text">Active</span></label>
+      <div class="mt-2">
+        <%= form.check_box :active, class: "checkbox checkbox-primary" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-control">
+    <label class="label"><span class="label-text">Stops</span></label>
+    <%= form.text_area :stops, class: "textarea textarea-bordered w-full", rows: 3, placeholder: "Comma-separated list of stops" %>
+    <span class="text-xs text-muted-foreground">Stored as JSON; enter a comma-separated list.</span>
+  </div>
+
+  <div class="form-control mt-6">
+    <%= form.submit class: "btn btn-primary w-full" %>
+  </div>
+<% end %>

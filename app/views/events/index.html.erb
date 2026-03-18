@@ -1,0 +1,82 @@
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8" data-controller="event">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">Events</h2>
+    <div class="flex items-center space-x-4">
+      <% if current_user.admin? || current_user.teacher? %>
+        <%= link_to "New Event", new_event_path, class: "btn btn-primary" %>
+      <% end %>
+      
+      <%= turbo_frame_tag "events-search", src: search_events_path, class: "hidden" do %>
+        <%= render "shared/search_form", placeholder: "Search events..." %>
+      <% end %>
+      
+      <%= button_tag type: "button", class: "btn btn-outline btn-search", data: { controller: "dropdown", action: "click->dropdown#toggle" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M9.75 9.75a4.5 4.5 0 110-9 4.5 4.5 0 010 9z" /></svg>
+      <% end %>
+      
+      <div class="dropdown dropdown-end z-[1]">
+        <div tabindex="0" role="button" class="btn btn-sm btn-circle btn-outline" data-dropdown-toggle="event-filters-dropdown">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5h6M9 11h6M9 17h6" /></svg>
+        </div>
+        <ul tabindex="0" class="menu dropdown-content z-[1] mt-3 w-52 p-2 shadow bg-base-100 rounded-box" id="event-filters-dropdown">
+          <li><%= link_to events_path, class: "flex items-center space-x-2" do %>
+              <span>All</span>
+              <% if params[:event_type].blank? && params[:query].blank? %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+          <li><%= link_to events_path(event_type: :academic), class: "flex items-center space-x-2" do %>
+              <span>Academic</span>
+              <% if params[:event_type] == "academic" %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+          <li><%= link_to events_path(event_type: :sports), class: "flex items-center space-x-2" do %>
+              <span>Sports</span>
+              <% if params[:event_type] == "sports" %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+          <li><%= link_to events_path(event_type: :cultural), class: "flex items-center space-x-2" do %>
+              <span>Cultural</span>
+              <% if params[:event_type] == "cultural" %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+          <li><%= link_to events_path(event_type: :administrative), class: "flex items-center space-x-2" do %>
+              <span>Administrative</span>
+              <% if params[:event_type] == "administrative" %>
+                <span class="badge badge-secondary ml-auto">active</span>
+              <% end %>
+            <% end %>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-between items-center mb-4">
+    <span class="text-sm text-muted-foreground">
+      <span id="event-count"><%= @events.count %></span> events
+    </span>
+  </div>
+
+  <% if @events.any? %>
+    <div id="event-list" data-event-list-target class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <% @events.each do |event| %>
+        <%= render event %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-12">
+      <p class="text-muted-foreground">No events found.</p>
+      <% if current_user.admin? || current_user.teacher? %>
+        <%= link_to "Create First Event", new_event_path, class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

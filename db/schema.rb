@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_16_083920) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_17_133046) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -70,6 +70,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_16_083920) do
     t.index ["user_id"], name: "index_audit_logs_on_user_id"
   end
 
+  create_table "buses", force: :cascade do |t|
+    t.boolean "active", default: true
+    t.string "bus_number"
+    t.integer "capacity"
+    t.datetime "created_at", null: false
+    t.string "driver_license_number"
+    t.string "driver_name"
+    t.string "driver_phone"
+    t.date "insurance_expiry"
+    t.date "last_maintenance_date"
+    t.date "next_maintenance_date"
+    t.string "registration_number"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "classrooms", force: :cascade do |t|
     t.integer "academic_year"
     t.integer "capacity"
@@ -83,6 +98,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_16_083920) do
     t.index ["class_teacher_id"], name: "index_classrooms_on_class_teacher_id"
     t.index ["grade_level"], name: "index_classrooms_on_grade_level"
     t.index ["name", "academic_year"], name: "index_classrooms_on_name_and_academic_year", unique: true
+  end
+
+  create_table "event_registrations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "event_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["event_id"], name: "index_event_registrations_on_event_id"
+    t.index ["user_id"], name: "index_event_registrations_on_user_id"
   end
 
   create_table "events", force: :cascade do |t|
@@ -265,6 +289,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_16_083920) do
     t.index ["transaction_date"], name: "index_transactions_on_transaction_date"
   end
 
+  create_table "transport_routes", force: :cascade do |t|
+    t.boolean "active", default: true
+    t.string "area"
+    t.datetime "created_at", null: false
+    t.decimal "distance_km"
+    t.time "dropoff_time"
+    t.decimal "monthly_fee"
+    t.string "name"
+    t.time "pickup_time"
+    t.string "route_code"
+    t.text "stops"
+    t.datetime "updated_at", null: false
+    t.index ["area"], name: "index_transport_routes_on_area"
+    t.index ["route_code"], name: "index_transport_routes_on_route_code", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address", null: false
@@ -285,6 +325,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_16_083920) do
   add_foreign_key "attendances", "users", column: "marked_by_id"
   add_foreign_key "audit_logs", "users"
   add_foreign_key "classrooms", "users", column: "class_teacher_id"
+  add_foreign_key "event_registrations", "events"
+  add_foreign_key "event_registrations", "users"
   add_foreign_key "fee_assignments", "fees"
   add_foreign_key "fee_assignments", "students"
   add_foreign_key "invoice_line_items", "fee_assignments"
