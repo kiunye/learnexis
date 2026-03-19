@@ -2,42 +2,53 @@
 <%= turbo_stream_from "dashboard:#{Current.user&.id}" %>
 
 <div>
-  <%# Page Header %>
-  <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-100">Dashboard</h1>
-    <p class="text-gray-400 mt-1">Welcome back, <%= Current.user&.email_address&.split("@")&.first&.capitalize || "User" %>!</p>
+  <%# Page Header (distilled: greeting + primary actions + status) %>
+  <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight text-base-content">Dashboard</h1>
+      <p class="mt-1 text-base-content/70">
+        Welcome back, <span class="text-base-content font-medium"><%= Current.user&.email_address&.split("@")&.first&.capitalize || "User" %></span>.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <% if Current.user&.admin? || Current.user&.teacher? %>
+        <%= link_to "Add student", new_student_path, class: "btn btn-sm btn-primary" %>
+        <%= link_to "Mark attendance", classrooms_path, class: "btn btn-sm btn-outline" %>
+      <% end %>
+
+      <% if Current.user&.admin? || Current.user&.teacher? || Current.user&.parent? %>
+        <%= link_to "Create invoice", new_invoice_path, class: "btn btn-sm btn-outline" %>
+        <%= link_to "Record payment", new_transaction_path, class: "btn btn-sm btn-outline" %>
+      <% end %>
+
+      <%= link_to "View notices", notices_path, class: "btn btn-sm btn-outline" %>
+    </div>
   </div>
 
-  <%# Responsive Grid Layout: 3 columns desktop, 2 tablet, 1 mobile %>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    
-    <%# Summary Metric Cards - Role-specific %>
-    <% if Current.user&.admin? %>
-      <%= render "dashboards/widget_metrics_admin" %>
-    <% elsif Current.user&.teacher? %>
-      <%= render "dashboards/widget_metrics_teacher" %>
-    <% elsif Current.user&.parent? %>
-      <%= render "dashboards/widget_metrics_parent" %>
-    <% else %>
-      <%= render "dashboards/widget_metrics_student" %>
-    <% end %>
+  <%# Needs attention (progressive disclosure: only what matters now) %>
+  <%= render "dashboards/widget_attention" %>
 
-    <%# Stats Component - Multi-metric Display %>
-    <%= render "dashboards/widget_stats" %>
+  <%# Distilled grid: keep a few high-signal widgets; remove placeholders %>
+  <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+      <%# Role-specific overview (now backed by real data for admin; others remain role widgets) %>
+      <% if Current.user&.admin? %>
+        <%= render "dashboards/widget_metrics_admin" %>
+      <% elsif Current.user&.teacher? %>
+        <%= render "dashboards/widget_metrics_teacher" %>
+      <% elsif Current.user&.parent? %>
+        <%= render "dashboards/widget_metrics_parent" %>
+      <% else %>
+        <%= render "dashboards/widget_metrics_student" %>
+      <% end %>
 
-    <%# Progress Cards %>
-    <%= render "dashboards/widget_progress" %>
+      <%= render "dashboards/widget_table_recent" %>
+    </div>
 
-    <%# List Cards with Icons %>
-    <%= render "dashboards/widget_list" %>
-
-    <%# Table Cards %>
-    <%= render "dashboards/widget_table_recent" %>
-    <%= render "dashboards/widget_table_upcoming" %>
-
-    <%# Chart Cards (Placeholder - will use Chartkick when installed) %>
-    <%= render "dashboards/widget_chart_attendance" %>
-    <%= render "dashboards/widget_chart_financial" %>
-
+    <div class="space-y-6">
+      <%= render "dashboards/widget_progress" %>
+      <%= render "dashboards/widget_table_upcoming" %>
+    </div>
   </div>
 </div>

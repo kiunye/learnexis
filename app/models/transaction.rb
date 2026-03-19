@@ -29,6 +29,8 @@ class Transaction < ApplicationRecord
   scope :for_student, ->(student) { where(student: student) }
   scope :for_invoice, ->(invoice) { where(invoice: invoice) }
   scope :payments, -> { where(transaction_type: :payment) }
+  scope :refunds, -> { where(transaction_type: :refund) }
+  scope :adjustments, -> { where(transaction_type: :adjustment) }
 
   private
 

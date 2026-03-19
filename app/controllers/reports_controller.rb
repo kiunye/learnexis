@@ -7,39 +7,44 @@ class ReportsController < ApplicationController
     @start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : 1.month.ago.beginning_of_month
     @end_date = params[:end_date].present? ? Date.parse(params[:end_date]) : Date.today.end_of_month
 
-    # Financial data
-    @total_income = Transaction.where(transaction_type: :income, transaction_date: @start_date..@end_date).sum(:amount)
-    @total_expenses = Transaction.where(transaction_type: :expense, transaction_date: @start_date..@end_date).sum(:amount)
-    @net_income = @total_income - @total_expenses
+    # Ledger-aligned: payment = money in, refund = money out, adjustment = +/- correction
+    range = @start_date..@end_date
+    base = Transaction.where(transaction_date: range)
 
-    # Income by payment method
-    @income_by_method = Transaction.where(transaction_type: :income, transaction_date: @start_date..@end_date)
-                                   .group(:payment_method)
-                                   .sum(:amount)
-                                   .transform_keys { |k| Transaction.payment_methods.key(k) || k.to_s }
+    @total_collections = base.payments.sum(:amount)
+    @total_refunds = base.refunds.sum(:amount)
+    @total_adjustments = base.adjustments.sum(:amount)
+    @net = @total_collections - @total_refunds + @total_adjustments
 
-    # Expenses by category (if we had expense categories, for now just show all expenses)
-    @expenses_by_method = Transaction.where(transaction_type: :expense, transaction_date: @start_date..@end_date)
-                                     .group(:payment_method)
-                                     .sum(:amount)
-                                     .transform_keys { |k| Transaction.payment_methods.key(k) || k.to_s }
+    # Collections by payment method
+    @collections_by_method = base.payments
+                                 .group(:payment_method)
+                                 .sum(:amount)
+                                 .transform_keys { |k| Transaction.payment_methods.key(k) || k.to_s }
+
+    # Refunds by payment method
+    @refunds_by_method = base.refunds
+                             .group(:payment_method)
+                             .sum(:amount)
+                             .transform_keys { |k| Transaction.payment_methods.key(k) || k.to_s }
 
     # Monthly trend (last 6 months)
     @monthly_trend = []
     6.times do |i|
       date = (@end_date - i.months).beginning_of_month
-      income = Transaction.where(transaction_type: :income,
-                                transaction_date: date..date.end_of_month).sum(:amount)
-      expense = Transaction.where(transaction_type: :expense,
-                                 transaction_date: date..date.end_of_month).sum(:amount)
+      month_range = date..date.end_of_month
+      collections = Transaction.where(transaction_date: month_range).payments.sum(:amount)
+      refunds = Transaction.where(transaction_date: month_range).refunds.sum(:amount)
+      adjustments = Transaction.where(transaction_date: month_range).adjustments.sum(:amount)
       @monthly_trend << {
         month: date.strftime("%b %Y"),
-        income: income,
-        expense: expense,
-        net: income - expense
+        collections: collections,
+        refunds: refunds,
+        adjustments: adjustments,
+        net: collections - refunds + adjustments
       }
     end
-    @monthly_trend.reverse! # Oldest to newest
+    @monthly_trend.reverse!
 
     respond_to do |format|
       format.html
@@ -104,26 +109,39 @@ class ReportsController < ApplicationController
     authorize [ :report, params[:action].to_sym ] if action_name.in?([ "financial", "attendance", "transport", "export" ])
   end
 
-  # CSV generation methods
+  # CSV generation methods (aligned to ledger: payment / refund / adjustment)
   def financial_to_csv
     CSV.generate(headers: true) do |csv|
       csv << [ "Financial Report", "Generated on #{Date.today}" ]
       csv << []
       csv << [ "Summary" ]
-      csv << [ "Total Income", number_to_currency(@total_income) ]
-      csv << [ "Total Expenses", number_to_currency(@total_expenses) ]
-      csv << [ "Net Income", number_to_currency(@net_income) ]
+      csv << [ "Total Collections (Payments)", number_to_currency(@total_collections) ]
+      csv << [ "Total Refunds", number_to_currency(@total_refunds) ]
+      csv << [ "Total Adjustments", number_to_currency(@total_adjustments) ]
+      csv << [ "Net", number_to_currency(@net) ]
       csv << []
-      csv << [ "Income by Payment Method" ]
+      csv << [ "Collections by Payment Method" ]
       csv << [ "Method", "Amount" ]
-      @income_by_method.each do |method, amount|
+      @collections_by_method.each do |method, amount|
+        csv << [ method, number_to_currency(amount) ]
+      end
+      csv << []
+      csv << [ "Refunds by Payment Method" ]
+      csv << [ "Method", "Amount" ]
+      @refunds_by_method.each do |method, amount|
         csv << [ method, number_to_currency(amount) ]
       end
       csv << []
       csv << [ "Monthly Trend (Last 6 Months)" ]
-      csv << [ "Month", "Income", "Expense", "Net" ]
+      csv << [ "Month", "Collections", "Refunds", "Adjustments", "Net" ]
       @monthly_trend.each do |month|
-        csv << [ month[:month], number_to_currency(month[:income]), number_to_currency(month[:expense]), number_to_currency(month[:net]) ]
+        csv << [
+          month[:month],
+          number_to_currency(month[:collections]),
+          number_to_currency(month[:refunds]),
+          number_to_currency(month[:adjustments]),
+          number_to_currency(month[:net])
+        ]
       end
     end
   end

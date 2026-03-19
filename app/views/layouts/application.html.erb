@@ -28,7 +28,7 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body class="font-sans" style="font-family: 'Lexend Deca', ui-sans-serif, system-ui, sans-serif;">
+  <body data-theme="learnexis" class="font-sans" style="font-family: 'Lexend Deca', ui-sans-serif, system-ui, sans-serif;">
     <%# DaisyUI Drawer Layout %>
     <div class="drawer lg:drawer-open">
       <input id="drawer-toggle" type="checkbox" class="drawer-toggle" />
@@ -39,7 +39,7 @@
         <%= render "shared/header" %>
         
         <%# Main content %>
-        <main class="flex-1 overflow-y-auto bg-gray-900">
+        <main class="flex-1 overflow-y-auto bg-base-200">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <%= yield %>
           </div>

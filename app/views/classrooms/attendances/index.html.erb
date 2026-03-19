@@ -46,7 +46,16 @@
       <div class="card-body">
         <%= render partial: "classrooms/attendances/register_table", locals: { classroom: @classroom, date: @date, students: @students, attendances_by_student: @attendances_by_student } %>
         <% if @students.empty? %>
-          <p class="text-center text-gray-700 py-8">No students in this classroom.</p>
+          <div class="text-center py-10">
+            <p class="font-medium text-gray-900">No students in this classroom yet</p>
+            <p class="mt-1 text-sm text-gray-600">Enroll students first, then you can mark attendance for them.</p>
+            <% if policy(@classroom).update? %>
+              <div class="mt-4 flex justify-center gap-2">
+                <%= link_to "Enroll students", enroll_students_classroom_path(@classroom), class: "btn btn-primary" %>
+                <%= link_to "Back to classroom", classroom_path(@classroom), class: "btn btn-ghost" %>
+              </div>
+            <% end %>
+          </div>
         <% end %>
       </div>
     </div>

@@ -57,42 +57,47 @@
   </div>
 
   <div class="space-y-6">
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- Summary Cards (ledger-aligned: payments, refunds, adjustments) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
-          <div class="stat-title text-gray-600">Total Income</div>
-          <div class="stat-value text-success"><%= number_to_currency(@total_income) %></div>
+          <div class="stat-title text-gray-600">Collections (Payments)</div>
+          <div class="stat-value text-success"><%= number_to_currency(@total_collections) %></div>
           <div class="stat-desc text-gray-600">From <%= @start_date.strftime("%b %d, %Y") %> to <%= @end_date.strftime("%b %d, %Y") %></div>
         </div>
       </div>
-      
       <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
-          <div class="stat-title text-gray-600">Total Expenses</div>
-          <div class="stat-value text-error"><%= number_to_currency(@total_expenses) %></div>
+          <div class="stat-title text-gray-600">Refunds</div>
+          <div class="stat-value text-error"><%= number_to_currency(@total_refunds) %></div>
           <div class="stat-desc text-gray-600">From <%= @start_date.strftime("%b %d, %Y") %> to <%= @end_date.strftime("%b %d, %Y") %></div>
         </div>
       </div>
-      
       <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
-          <div class="stat-title text-gray-600">Net Income</div>
-          <div class="stat-value <%= @net_income >= 0 ? "text-success" : "text-error" %>"><%= number_to_currency(@net_income) %></div>
-          <div class="stat-desc text-gray-600">Income minus expenses</div>
+          <div class="stat-title text-gray-600">Adjustments</div>
+          <div class="stat-value <%= @total_adjustments >= 0 ? "text-success" : "text-error" %>"><%= number_to_currency(@total_adjustments) %></div>
+          <div class="stat-desc text-gray-600">Corrections in period</div>
+        </div>
+      </div>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="stat-title text-gray-600">Net</div>
+          <div class="stat-value <%= @net >= 0 ? "text-success" : "text-error" %>"><%= number_to_currency(@net) %></div>
+          <div class="stat-desc text-gray-600">Collections − Refunds + Adjustments</div>
         </div>
       </div>
     </div>
 
-    <!-- Income by Payment Method -->
+    <!-- Collections by Payment Method -->
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="card-title text-lg font-semibold">Income by Payment Method</h3>
+          <h3 class="card-title text-lg font-semibold">Collections by Payment Method</h3>
         </div>
-        <% if @income_by_method.any? %>
+        <% if @collections_by_method.any? %>
           <div class="space-y-2">
-            <% @income_by_method.each do |method, amount| %>
+            <% @collections_by_method.each do |method, amount| %>
               <div class="flex justify-between items-center">
                 <span><%= method.to_s.titleize %></span>
                 <span class="badge badge-success"><%= number_to_currency(amount) %></span>
@@ -100,7 +105,28 @@
             <% end %>
           </div>
         <% else %>
-          <p class="text-muted-foreground">No income records found for the selected period.</p>
+          <p class="text-muted-foreground">No collections in the selected period.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Refunds by Payment Method -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="card-title text-lg font-semibold">Refunds by Payment Method</h3>
+        </div>
+        <% if @refunds_by_method.any? %>
+          <div class="space-y-2">
+            <% @refunds_by_method.each do |method, amount| %>
+              <div class="flex justify-between items-center">
+                <span><%= method.to_s.titleize %></span>
+                <span class="badge badge-error"><%= number_to_currency(amount) %></span>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-muted-foreground">No refunds in the selected period.</p>
         <% end %>
       </div>
     </div>
@@ -117,8 +143,9 @@
               <thead>
                 <tr>
                   <th>Month</th>
-                  <th class="text-right">Income</th>
-                  <th class="text-right">Expense</th>
+                  <th class="text-right">Collections</th>
+                  <th class="text-right">Refunds</th>
+                  <th class="text-right">Adjustments</th>
                   <th class="text-right">Net</th>
                 </tr>
               </thead>
@@ -126,8 +153,9 @@
                 <% @monthly_trend.each do |month| %>
                   <tr>
                     <td><%= month[:month] %></td>
-                    <td class="text-right"><%= number_to_currency(month[:income]) %></td>
-                    <td class="text-right"><%= number_to_currency(month[:expense]) %></td>
+                    <td class="text-right"><%= number_to_currency(month[:collections]) %></td>
+                    <td class="text-right"><%= number_to_currency(month[:refunds]) %></td>
+                    <td class="text-right"><%= number_to_currency(month[:adjustments]) %></td>
                     <td class="text-right <%= month[:net] >= 0 ? "text-success" : "text-error" %>"><%= number_to_currency(month[:net]) %></td>
                   </tr>
                 <% end %>
