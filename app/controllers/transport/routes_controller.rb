@@ -24,10 +24,12 @@ module Transport
 
     def new
       @transport_route = TransportRoute.new
+      @buses = Bus.order(:bus_number)
     end
 
     def create
       @transport_route = TransportRoute.new(transport_route_params)
+      @buses = Bus.order(:bus_number)
 
       if @transport_route.save
         redirect_to transport_routes_path, notice: "Transport route was successfully created."
@@ -43,6 +45,7 @@ module Transport
       if @transport_route.update(transport_route_params)
         redirect_to transport_routes_path, notice: "Transport route was successfully updated."
       else
+        @buses = Bus.order(:bus_number)
         render :edit, status: :unprocessable_entity
       end
     end
@@ -56,6 +59,7 @@ module Transport
 
     def set_transport_route
       @transport_route = TransportRoute.find(params[:id])
+      @buses = Bus.order(:bus_number)
     end
 
     def transport_route_params
@@ -68,7 +72,8 @@ module Transport
         :monthly_fee,
         :pickup_time,
         :dropoff_time,
-        :active
+        :active,
+        :bus_id
       )
     end
   end

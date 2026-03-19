@@ -1,0 +1,71 @@
+<%= form_with model: @event, class: "space-y-4" do |form| %>
+  <% if @event.errors.any? %>
+    <div class="alert alert-error">
+      <span><%= pluralize(@event.errors.count, "error") %> prohibited this event from being saved:</span>
+      <ul>
+        <% @event.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-control">
+    <label class="label"><span class="label-text">Title</span></label>
+    <%= form.text_field :title, class: "input input-bordered w-full", required: true %>
+  </div>
+
+  <div class="form-control">
+    <label class="label"><span class="label-text">Description</span></label>
+    <%= form.text_area :description, class: "textarea textarea-bordered w-full", rows: 4, required: true %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label"><span class="label-text">Event Type</span></label>
+      <%= form.select :event_type, Event.event_types.keys.map { |k| [ k.to_s.titleize, k ] }, { include_blank: "Select type" }, class: "select select-bordered w-full" %>
+    </div>
+    <div class="form-control">
+      <label class="label"><span class="label-text">Organizer (teacher)</span></label>
+      <%= form.select :organizer_id,
+          options_from_collection_for_select(@teachers || [], :id, :full_name, @event.organizer_id),
+          { include_blank: "Select organizer..." },
+          class: "select select-bordered w-full" %>
+      <span class="label-text-alt text-base-content/70">Must be a teacher</span>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label"><span class="label-text">Start</span></label>
+      <%= form.datetime_local_field :start_datetime, class: "input input-bordered w-full", required: true %>
+    </div>
+    <div class="form-control">
+      <label class="label"><span class="label-text">End</span></label>
+      <%= form.datetime_local_field :end_datetime, class: "input input-bordered w-full", required: true %>
+    </div>
+  </div>
+
+  <div class="form-control">
+    <label class="label"><span class="label-text">Location</span></label>
+    <%= form.text_field :location, class: "input input-bordered w-full", required: true %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="form-control">
+      <label class="label"><span class="label-text">Max participants</span></label>
+      <%= form.number_field :max_participants, class: "input input-bordered w-full", min: 1, placeholder: "Leave blank for unlimited" %>
+      <span class="label-text-alt text-base-content/70">Optional; blank = unlimited</span>
+    </div>
+    <div class="form-control">
+      <label class="label"><span class="label-text">Registration required</span></label>
+      <div class="mt-2">
+        <%= form.check_box :registration_required, class: "checkbox checkbox-primary" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-control mt-6">
+    <%= form.submit class: "btn btn-primary w-full" %>
+  </div>
+<% end %>

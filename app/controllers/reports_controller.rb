@@ -156,7 +156,7 @@ class ReportsController < ApplicationController
       csv << [ "Overall Occupancy Rate", "#{number_with_precision(@overall_occupancy, precision: 1)}%" ]
       csv << []
       csv << [ "Route Details" ]
-      csv << [ "Route Name", "Route Code", "Area", "Bus Number", "Student Count", "Capacity", "Occupancy Rate", "Monthly Revenue", "Available Seats" ]
+      csv << [ "Route Name", "Route Code", "Area", "Bus (Number Plate)", "Student Count", "Capacity", "Occupancy Rate", "Monthly Revenue", "Available Seats" ]
       @transport_data.each do |data|
         csv << [
           data[:route].name,

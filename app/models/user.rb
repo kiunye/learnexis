@@ -17,6 +17,8 @@ class User < ApplicationRecord
 
   validates :role, presence: true
 
+  scope :teachers, -> { where(role: :teacher).order(:first_name, :last_name) }
+
   def profile
     case role
     when "teacher"

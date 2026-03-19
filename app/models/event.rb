@@ -8,7 +8,7 @@ class Event < ApplicationRecord
   # and add validation if needed.
 
   # Associations
-  belongs_to :organizer, class_name: "User"
+  belongs_to :organizer, class_name: "User", optional: true
   has_many :event_registrations, dependent: :destroy
   has_many :participants, through: :event_registrations, source: :user
 
@@ -16,6 +16,7 @@ class Event < ApplicationRecord
   validates :title, :description, :location, :start_datetime, :end_datetime, presence: true
   validates :registration_required, inclusion: { in: [ true, false ] }
   validates :max_participants, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
+  validate :organizer_must_be_teacher
   validate :end_datetime_after_start_datetime
 
   # Scopes (if needed)
@@ -23,6 +24,13 @@ class Event < ApplicationRecord
   scope :upcoming, -> { where("start_datetime > ?", Time.current).order(start_datetime: :asc) }
 
   private
+
+  def organizer_must_be_teacher
+    return if organizer_id.blank?
+    return if organizer&.teacher?
+
+    errors.add(:organizer_id, "must be a teacher")
+  end
 
   def end_datetime_after_start_datetime
     if start_datetime.present? && end_datetime.present? && end_datetime <= start_datetime

@@ -22,16 +22,18 @@ class EventsController < ApplicationController
   # GET /events/new
   def new
     @event = Event.new
+    @teachers = User.teachers
   end
 
   # GET /events/1/edit
   def edit
+    @teachers = User.teachers
   end
 
   # POST /events or /events.json
   def create
     @event = Event.new(event_params)
-    @event.organizer = current_user
+    set_organizer_on_create
 
     respond_with_event_save(
       ok: @event.save,
@@ -94,7 +96,16 @@ class EventsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def event_params
-      params.require(:event).permit(:title, :description, :event_type, :start_datetime, :end_datetime, :location, :registration_required, :max_participants)
+      params.require(:event).permit(:title, :description, :event_type, :start_datetime, :end_datetime, :location, :registration_required, :max_participants, :organizer_id)
+    end
+
+    def set_organizer_on_create
+      organizer_id = params.dig(:event, :organizer_id).presence
+      if organizer_id.present?
+        organizer = User.teachers.find_by(id: organizer_id)
+        @event.organizer = organizer if organizer
+      end
+      @event.organizer ||= current_user if current_user&.teacher? || current_user&.admin?
     end
 
     # Authorization using Pundit

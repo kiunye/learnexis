@@ -123,6 +123,16 @@
           </div>
 
           <div class="form-control">
+            <%= f.label :transport_route_id, class: "label" do %>
+              <span class="label-text text-gray-300">Transport Route</span>
+            <% end %>
+            <%= f.select :transport_route_id,
+                options_from_collection_for_select(@transport_routes || [], :id, :name, @student&.transport_route_id),
+                { include_blank: "Select route..." },
+                { class: "select select-bordered w-full" } %>
+          </div>
+
+          <div class="form-control">
             <%= f.label :blood_group, class: "label" do %>
               <span class="label-text text-gray-300">Blood Group</span>
             <% end %>

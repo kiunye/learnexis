@@ -50,6 +50,7 @@ class StudentsController < ApplicationController
     @admission_service = AdmissionService.new
     @classrooms = Classroom.order(:grade_level, :section)
     @parents = User.where(role: :parent).order(:first_name, :last_name)
+    @transport_routes = TransportRoute.order(:name)
   end
 
   def create
@@ -58,6 +59,7 @@ class StudentsController < ApplicationController
     @admission_service = AdmissionService.new
     @classrooms = Classroom.order(:grade_level, :section)
     @parents = User.where(role: :parent).order(:first_name, :last_name)
+    @transport_routes = TransportRoute.order(:name)
 
     # Handle photo upload if present
     photo_params = params[:student][:photo] if params[:student] && params[:student][:photo]
@@ -66,7 +68,8 @@ class StudentsController < ApplicationController
       student_params: student_params,
       user_params: user_params,
       parent_ids: params[:parent_ids] || [],
-      classroom_id: params[:student][:classroom_id].presence
+      classroom_id: params[:student][:classroom_id].presence,
+      transport_route_id: params[:student][:transport_route_id].presence
     )
 
     if @admission_service.success? && student
@@ -87,6 +90,7 @@ class StudentsController < ApplicationController
     @admission_service = AdmissionService.new
     @classrooms = Classroom.order(:grade_level, :section)
     @parents = User.where(role: :parent).order(:first_name, :last_name)
+    @transport_routes = TransportRoute.order(:name)
     @selected_parent_ids = @student.parents.pluck(:id)
   end
 
@@ -94,6 +98,7 @@ class StudentsController < ApplicationController
     @admission_service = AdmissionService.new
     @classrooms = Classroom.order(:grade_level, :section)
     @parents = User.where(role: :parent).order(:first_name, :last_name)
+    @transport_routes = TransportRoute.order(:name)
 
     # Handle photo upload if present
     photo_params = params[:student][:photo] if params[:student] && params[:student][:photo]
@@ -149,6 +154,7 @@ class StudentsController < ApplicationController
       :emergency_contact_phone,
       :blood_group,
       :classroom_id,
+      :transport_route_id,
       :photo
     )
   end

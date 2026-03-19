@@ -10,8 +10,9 @@ class AdmissionService
   # @param user_params [Hash] User attributes (email_address, first_name, last_name, phone_number, password)
   # @param parent_ids [Array<Integer>] Optional array of parent user IDs to link
   # @param classroom_id [Integer] Optional classroom ID
+  # @param transport_route_id [Integer] Optional transport route ID
   # @return [Student, nil] Created student or nil if failed
-  def create_admission(student_params:, user_params:, parent_ids: [], classroom_id: nil)
+  def create_admission(student_params:, user_params:, parent_ids: [], classroom_id: nil, transport_route_id: nil)
     ActiveRecord::Base.transaction do
       # Generate admission number
       admission_number = generate_admission_number
@@ -45,7 +46,8 @@ class AdmissionService
         emergency_contact_phone: student_params[:emergency_contact_phone],
         blood_group: student_params[:blood_group],
         user: user,
-        classroom_id: classroom_id
+        classroom_id: classroom_id,
+        transport_route_id: transport_route_id
       )
 
       unless student.save

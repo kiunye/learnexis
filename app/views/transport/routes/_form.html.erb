@@ -22,6 +22,14 @@
     </div>
   </div>
 
+  <div class="form-control">
+    <label class="label"><span class="label-text">Bus (number plate)</span></label>
+    <%= form.select :bus_id,
+        options_from_collection_for_select(@buses || [], :id, :bus_number, @transport_route.bus_id),
+        { include_blank: "Select bus..." },
+        class: "select select-bordered w-full" %>
+  </div>
+
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div class="form-control">
       <label class="label"><span class="label-text">Area</span></label>

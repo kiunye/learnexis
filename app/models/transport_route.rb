@@ -1,6 +1,6 @@
 class TransportRoute < ApplicationRecord
   # Associations
-  belongs_to :bus
+  belongs_to :bus, optional: true
   has_many :students
 
   # Validations

@@ -10,7 +10,7 @@
       </div>
     </div>
     
-    <p class="text-preline mb-4"><%= truncate(event.content || event.description, length: 150) %></p>
+    <p class="text-preline mb-4"><%= truncate(event.description.to_s, length: 150) %></p>
     
     <div class="flex justify-between items-center text-sm text-muted-foreground">
       <div>

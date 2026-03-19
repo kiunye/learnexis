@@ -12,8 +12,9 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div class="form-control">
-      <label class="label"><span class="label-text">Bus Number</span></label>
-      <%= form.text_field :bus_number, class: "input input-bordered w-full", required: true %>
+      <label class="label"><span class="label-text">Number plate (Kenya style)</span></label>
+      <%= form.text_field :bus_number, class: "input input-bordered w-full", required: true, placeholder: "e.g. KCA 123A" %>
+      <span class="label-text-alt text-base-content/70">Format: 2–3 letters, digits, 1 letter (e.g. KBA 456B)</span>
     </div>
 
     <div class="form-control">

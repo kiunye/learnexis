@@ -1,4 +1,11 @@
 module ApplicationHelper
+  # Renders a DaisyUI-style badge. variant: info, warning, error, success, secondary, primary, etc.
+  def badge_tag(text, variant: "neutral", **options)
+    css = options.delete(:class).to_s
+    badge_class = "badge badge-#{variant} #{css}".strip
+    content_tag(:span, text, options.merge(class: badge_class))
+  end
+
   def flash_class(type)
     case type.to_s
     when "notice", "success"

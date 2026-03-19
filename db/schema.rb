@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_17_133046) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_18_120003) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -115,11 +115,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_133046) do
     t.datetime "end_datetime"
     t.integer "event_type"
     t.string "location"
+    t.integer "max_participants"
+    t.integer "organizer_id"
     t.boolean "registration_required"
     t.datetime "start_datetime"
     t.integer "target_audience"
     t.string "title"
     t.datetime "updated_at", null: false
+    t.index ["organizer_id"], name: "index_events_on_organizer_id"
   end
 
   create_table "fee_assignments", force: :cascade do |t|
@@ -252,11 +255,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_133046) do
     t.text "medical_conditions"
     t.text "special_needs"
     t.integer "status", default: 0
+    t.integer "transport_route_id"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["admission_number"], name: "index_students_on_admission_number", unique: true
     t.index ["classroom_id"], name: "index_students_on_classroom_id"
     t.index ["status"], name: "index_students_on_status"
+    t.index ["transport_route_id"], name: "index_students_on_transport_route_id"
     t.index ["user_id"], name: "index_students_on_user_id", unique: true
   end
 
@@ -292,6 +297,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_133046) do
   create_table "transport_routes", force: :cascade do |t|
     t.boolean "active", default: true
     t.string "area"
+    t.integer "bus_id"
     t.datetime "created_at", null: false
     t.decimal "distance_km"
     t.time "dropoff_time"
@@ -302,6 +308,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_133046) do
     t.text "stops"
     t.datetime "updated_at", null: false
     t.index ["area"], name: "index_transport_routes_on_area"
+    t.index ["bus_id"], name: "index_transport_routes_on_bus_id"
     t.index ["route_code"], name: "index_transport_routes_on_route_code", unique: true
   end
 
@@ -327,6 +334,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_133046) do
   add_foreign_key "classrooms", "users", column: "class_teacher_id"
   add_foreign_key "event_registrations", "events"
   add_foreign_key "event_registrations", "users"
+  add_foreign_key "events", "users", column: "organizer_id"
   add_foreign_key "fee_assignments", "fees"
   add_foreign_key "fee_assignments", "students"
   add_foreign_key "invoice_line_items", "fee_assignments"
@@ -338,9 +346,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_133046) do
   add_foreign_key "parent_student_relationships", "users", column: "parent_id"
   add_foreign_key "sessions", "users"
   add_foreign_key "students", "classrooms"
+  add_foreign_key "students", "transport_routes"
   add_foreign_key "students", "users"
   add_foreign_key "teacher_profiles", "users"
   add_foreign_key "transactions", "invoices"
   add_foreign_key "transactions", "students"
   add_foreign_key "transactions", "users", column: "recorded_by_id"
+  add_foreign_key "transport_routes", "buses"
 end
