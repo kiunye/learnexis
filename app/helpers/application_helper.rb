@@ -1,4 +1,17 @@
 module ApplicationHelper
+  # Best link for "mark attendance today" (first accessible classroom), else classrooms index.
+  def mark_attendance_quick_path
+    user = Current.user
+    return classrooms_path unless user&.admin? || user&.teacher?
+
+    classroom = Pundit.policy_scope!(user, Classroom).order(:name).first
+    if classroom
+      mark_classroom_attendances_path(classroom, date: Date.current)
+    else
+      classrooms_path
+    end
+  end
+
   # Renders a DaisyUI-style badge. variant: info, warning, error, success, secondary, primary, etc.
   def badge_tag(text, variant: "neutral", **options)
     css = options.delete(:class).to_s

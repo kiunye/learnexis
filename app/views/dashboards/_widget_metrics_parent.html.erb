@@ -4,35 +4,40 @@
     <div class="card-body">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <h2 class="card-title text-lg font-bold text-base-content">My Children</h2>
-          <p class="mt-1 text-xs text-base-content/60">What changed since your last visit.</p>
+          <h2 class="card-title text-lg font-bold text-base-content">My children</h2>
+          <p class="mt-1 text-xs text-base-content/60">Fees and attendance for your family.</p>
         </div>
         <span class="badge badge-outline border-base-300 text-base-content/70">Parent</span>
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div>
           <p class="text-xs text-base-content/60">Children</p>
-          <p class="mt-1 text-2xl font-bold text-base-content">0</p>
-          <p class="mt-1 text-xs text-base-content/55">Enrolled</p>
+          <p class="mt-1 text-2xl font-bold text-base-content"><%= @dashboard_data[:total_students] %></p>
+          <p class="mt-1 text-xs text-base-content/55">Linked to your account</p>
         </div>
         <div>
-          <p class="text-xs text-base-content/60">Outstanding Fees</p>
-          <p class="mt-1 text-2xl font-bold text-base-content">$0</p>
-          <p class="mt-1 text-xs text-base-content/55">0 invoices</p>
+          <p class="text-xs text-base-content/60">Outstanding fees</p>
+          <p class="mt-1 text-2xl font-bold text-base-content"><%= number_to_currency(@dashboard_data[:pending_fees_amount]) %></p>
+          <p class="mt-1 text-xs text-base-content/55"><%= @dashboard_data[:pending_invoices_count] %> open invoices</p>
         </div>
         <div>
-          <p class="text-xs text-base-content/60">Attendance</p>
-          <p class="mt-1 text-2xl font-bold text-base-content">0%</p>
-          <p class="mt-1 text-xs text-base-content/55">This month</p>
+          <p class="text-xs text-base-content/60">Attendance today</p>
+          <p class="mt-1 text-2xl font-bold text-base-content">
+            <%= @dashboard_data[:attendance_rate].nil? ? "—" : "#{@dashboard_data[:attendance_rate]}%" %>
+          </p>
+          <p class="mt-1 text-xs text-base-content/55">
+            <%= @dashboard_data[:attendance_total].zero? ? "No marks recorded today" : "#{@dashboard_data[:attendance_present]} present of #{@dashboard_data[:attendance_total]} marked" %>
+          </p>
         </div>
         <div>
-          <p class="text-xs text-base-content/60">Upcoming Events</p>
-          <p class="mt-1 text-2xl font-bold text-base-content">0</p>
-          <p class="mt-1 text-xs text-base-content/55">This week</p>
+          <p class="text-xs text-base-content/60">Reports</p>
+          <p class="mt-1 text-sm font-medium text-base-content">Full history</p>
+          <p class="mt-1 text-xs text-base-content/55">See attendance report for date range</p>
         </div>
       </div>
       <div class="mt-5 flex flex-wrap gap-2">
-        <%= link_to "View invoices", invoices_path, class: "btn btn-sm btn-primary", data: { turbo_frame: "_top" } %>
+        <%= link_to "Attendance report", attendance_reports_path, class: "btn btn-sm btn-primary", data: { turbo_frame: "_top" } %>
+        <%= link_to "View invoices", invoices_path, class: "btn btn-sm btn-outline", data: { turbo_frame: "_top" } %>
         <%= link_to "View notices", notices_path, class: "btn btn-sm btn-outline", data: { turbo_frame: "_top" } %>
       </div>
     </div>

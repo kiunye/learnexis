@@ -40,7 +40,15 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
+    # Optional: MPESA_WEBHOOK_SECRET (add to .kamal/secrets and list here when used)
   clear:
+    # Integrations (production): also run Flipper.enable(:sms) / Flipper.enable(:mpesa) in console.
+    # ENABLE_SMS: true
+    # ENABLE_MPESA: true
+    # Emergency kill switches (truthy values disable regardless of Flipper):
+    # FORCE_DISABLE_SMS: "1"
+    # FORCE_DISABLE_MPESA: "1"
+
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
     SOLID_QUEUE_IN_PUMA: true

@@ -1,0 +1,92 @@
+<%# Financial report PDF – rendered to HTML then converted to PDF by Grover. %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Financial Report</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; font-size: 11px; color: #000; margin: 0; padding: 0; line-height: 1.4; }
+    .report-header { margin-bottom: 20px; }
+    .report-header .brand { font-size: 14px; font-weight: 700; }
+    .report-header h1 { font-size: 18px; font-weight: 700; margin: 2px 0 4px 0; }
+    .report-header .meta { font-size: 10px; color: #666; }
+    .report-header .meta-gen { font-size: 9px; color: #888; }
+    .section-title { font-size: 12px; font-weight: 700; margin: 20px 0 6px 0; }
+    table.data { width: 100%; border-collapse: collapse; font-size: 11px; }
+    table.data th { background: #E8E8E8; font-weight: 700; text-align: left; padding: 8px 10px; }
+    table.data td { padding: 8px 10px; border-bottom: 1px solid #eee; }
+    table.data .num { text-align: right; }
+    table.data tr.summary-net { font-weight: 700; }
+    .footer-note { margin-top: 24px; font-size: 8px; color: #888; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="report-header">
+    <div class="brand">Learnexis</div>
+    <h1>Financial Report</h1>
+    <div class="meta">Period: <%= start_date.strftime('%d %b %Y') %> – <%= end_date.strftime('%d %b %Y') %></div>
+    <div class="meta-gen">Generated: <%= Time.current.strftime('%d %b %Y %H:%M') %></div>
+  </div>
+
+  <div class="section-title">Summary</div>
+  <table class="data">
+    <tr><td>Collections (Payments)</td><td class="num"><%= number_to_currency(total_collections) %></td></tr>
+    <tr><td>Refunds</td><td class="num"><%= number_to_currency(total_refunds) %></td></tr>
+    <tr><td>Adjustments</td><td class="num"><%= number_to_currency(total_adjustments) %></td></tr>
+    <tr class="summary-net"><td>Net</td><td class="num"><%= number_to_currency(net) %></td></tr>
+  </table>
+
+  <% if collections_by_method.present? %>
+    <div class="section-title">Collections by Payment Method</div>
+    <table class="data">
+      <thead><tr><th>Method</th><th class="num">Amount</th></tr></thead>
+      <tbody>
+        <% collections_by_method.each do |method, amount| %>
+          <tr><td><%= method.to_s.titleize %></td><td class="num"><%= number_to_currency(amount) %></td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+
+  <% if refunds_by_method.present? %>
+    <div class="section-title">Refunds by Payment Method</div>
+    <table class="data">
+      <thead><tr><th>Method</th><th class="num">Amount</th></tr></thead>
+      <tbody>
+        <% refunds_by_method.each do |method, amount| %>
+          <tr><td><%= method.to_s.titleize %></td><td class="num"><%= number_to_currency(amount) %></td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+
+  <% if monthly_trend.present? %>
+    <div class="section-title">Monthly Trend (Last 6 Months)</div>
+    <table class="data" style="font-size: 9px;">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th class="num">Collections</th>
+          <th class="num">Refunds</th>
+          <th class="num">Adjustments</th>
+          <th class="num">Net</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% monthly_trend.each do |m| %>
+          <tr>
+            <td><%= m[:month] %></td>
+            <td class="num"><%= number_to_currency(m[:collections]) %></td>
+            <td class="num"><%= number_to_currency(m[:refunds]) %></td>
+            <td class="num"><%= number_to_currency(m[:adjustments]) %></td>
+            <td class="num"><%= number_to_currency(m[:net]) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+
+  <div class="footer-note">Learnexis Financial Report – Generated <%= Time.current.strftime('%d %b %Y %H:%M') %></div>
+</body>
+</html>

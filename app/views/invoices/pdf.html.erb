@@ -1,0 +1,136 @@
+<%# Invoice PDF template – rendered to HTML then converted to PDF by Grover. Inline CSS for reliable PDF output. %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice #<%= @invoice.id %></title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-size: 11px;
+      color: #000;
+      margin: 0;
+      padding: 0;
+      line-height: 1.4;
+    }
+    .page-header {
+      background: #1F4E79;
+      color: #fff;
+      padding: 12px 10px 12px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin: -40px -40px 20px -40px;
+      padding: 14px 40px;
+    }
+    .brand { font-size: 16px; font-weight: 700; }
+    .invoice-title-block { text-align: right; }
+    .invoice-title-block .title { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+    .invoice-title-block .meta { font-size: 9px; opacity: 0.95; }
+    .two-col {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .col-left { flex: 1; max-width: 55%; }
+    .col-right { flex: 0 0 40%; text-align: right; }
+    .label { font-size: 9px; font-weight: 700; margin-bottom: 3px; }
+    .muted { color: #666; font-size: 9px; }
+    .total-amount { font-size: 14px; font-weight: 700; margin: 3px 0; }
+    table.line-items {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10px;
+    }
+    table.line-items th {
+      background: #E3ECF7;
+      font-weight: 700;
+      text-align: left;
+      padding: 8px 10px;
+    }
+    table.line-items th.qty,
+    table.line-items th.unit,
+    table.line-items th.amount,
+    table.line-items td.qty,
+    table.line-items td.unit,
+    table.line-items td.amount { text-align: right; }
+    table.line-items td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #eee;
+    }
+    table.line-items tbody tr:nth-child(even) { background: #F8F8F8; }
+    .totals-block {
+      margin-top: 14px;
+      text-align: right;
+      width: 200px;
+      margin-left: auto;
+    }
+    .totals-block hr {
+      border: none;
+      border-top: 1px solid #ddd;
+      margin-bottom: 6px;
+    }
+    .totals-block .due-label { font-size: 10px; font-weight: 700; }
+    .totals-block .due-amount { font-size: 12px; font-weight: 700; }
+    .notes { margin-top: 10px; font-size: 9px; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <div class="brand">Learnexis</div>
+    <div class="@invoice-title-block">
+      <div class="title">INVOICE</div>
+      <div class="meta">Invoice #<%= @invoice.id %></div>
+      <div class="meta">Issue: <%= @invoice.issue_date.strftime('%d %b %Y') %></div>
+      <div class="meta"><strong>Due: <%= @invoice.due_date.strftime('%d %b %Y') %></strong></div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="col-left">
+      <div class="label">Bill to</div>
+      <div><strong><%= @invoice.student.full_name %></strong></div>
+      <div class="muted">Admission: <%= @invoice.student.admission_number %></div>
+    </div>
+    <div class="col-right">
+      <div class="label">Total due</div>
+      <div class="total-amount"><%= number_to_currency(@invoice.total_amount) %></div>
+      <div class="muted"><%= @invoice.notes.presence || "School Fees" %></div>
+    </div>
+  </div>
+
+  <table class="line-items">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th class="qty">Qty</th>
+        <th class="unit">Unit Amount</th>
+        <th class="amount">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @invoice.invoice_line_items.each do |line| %>
+        <tr>
+          <td><%= line.description %></td>
+          <td class="qty"><%= line.quantity %></td>
+          <td class="unit"><%= number_to_currency(line.unit_amount) %></td>
+          <td class="amount"><%= number_to_currency(line.amount) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div class="totals-block">
+    <hr>
+    <div class="due-label">Amount Due</div>
+    <div class="due-amount"><%= number_to_currency(@invoice.total_amount) %></div>
+  </div>
+
+  <% if @invoice.notes.present? %>
+    <div class="notes"><%= @invoice.notes %></div>
+  <% end %>
+</body>
+</html>

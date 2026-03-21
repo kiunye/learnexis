@@ -1,32 +1,35 @@
 <% content_for :title, "Mark Attendance - #{@classroom.name}" %>
 
 <div data-controller="attendance-mark">
-  <div class="mb-6 flex justify-between items-center">
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start">
     <div>
       <div class="breadcrumbs text-sm mb-2">
         <ul>
-          <li><%= link_to "Classrooms", classrooms_path, class: "text-blue-600 hover:text-blue-700" %></li>
-          <li><%= link_to @classroom.name, classroom_path(@classroom), class: "text-blue-600 hover:text-blue-700" %></li>
-          <li><%= link_to "Attendance", classroom_attendances_path(@classroom), class: "text-blue-600 hover:text-blue-700" %></li>
+          <li><%= link_to "Classrooms", classrooms_path, class: "link link-hover link-primary" %></li>
+          <li><%= link_to @classroom.name, classroom_path(@classroom), class: "link link-hover link-primary" %></li>
+          <li><%= link_to "Attendance", classroom_attendances_path(@classroom), class: "link link-hover link-primary" %></li>
           <li>Mark</li>
         </ul>
       </div>
-      <h1 class="text-3xl font-bold text-gray-900">Mark Attendance</h1>
-      <p class="text-gray-600 mt-1"><%= @classroom.name %> • <%= @date.strftime("%A, %B %d, %Y") %></p>
+      <h1 class="text-3xl font-bold text-base-content">Mark attendance</h1>
+      <p class="text-base-content/70 mt-1"><%= @classroom.name %> · <%= @date.strftime("%A, %B %d, %Y") %></p>
     </div>
-    <div class="flex gap-2">
-      <%= link_to classroom_attendances_path(@classroom, date: @date), class: "btn btn-ghost" do %>
-        View Register
+    <div class="flex flex-wrap gap-2">
+      <%= link_to classroom_attendances_path(@classroom, date: @date), class: "btn btn-ghost btn-sm" do %>
+        View register
       <% end %>
-      <%= link_to classroom_path(@classroom), class: "btn btn-ghost" do %>
-        Back to Classroom
+      <%= link_to reports_classroom_attendances_path(@classroom), class: "btn btn-outline btn-sm" do %>
+        Class report
+      <% end %>
+      <%= link_to classroom_path(@classroom), class: "btn btn-ghost btn-sm" do %>
+        Classroom
       <% end %>
     </div>
   </div>
 
-  <%# Summary (live-updated via Turbo Stream) %>
-  <% summary = { present: 0, absent: 0, late: 0, excused: 0, total: @students.size }; @attendances_by_student.each_value { |a| summary[:"#{a.status}"] = (summary[:"#{a.status}"] || 0) + 1 } %>
-  <div id="attendance_summary" class="card bg-white shadow-md mb-4">
+  <% summary = { present: 0, absent: 0, late: 0, excused: 0, total: @students.size }
+     @attendances_by_student.each_value { |a| summary[a.status.to_sym] = (summary[a.status.to_sym] || 0) + 1 } %>
+  <div id="attendance_summary" class="card bg-base-200 border border-base-300 shadow-sm mb-4">
     <div class="card-body py-3">
       <%= render partial: "classrooms/attendances/attendance_summary", locals: {
         present_count: summary[:present],
@@ -39,23 +42,27 @@
     </div>
   </div>
 
-  <%# Quick actions %>
-  <div class="card bg-white shadow-md mb-6">
-    <div class="card-body">
-      <h2 class="card-title text-lg text-gray-900 mb-2">Quick Actions</h2>
-      <div class="flex flex-wrap gap-2 join">
-        <button type="button" data-action="click->attendance-mark#markAllPresent" class="btn btn-success join-item">
-          Mark All Present
-        </button>
-        <button type="button" data-action="click->attendance-mark#markAllAbsent" class="btn btn-error join-item">
-          Mark All Absent
-        </button>
+  <%= form_with url: classroom_attendances_path(@classroom), method: :patch, data: { turbo_stream: true }, id: "attendance_form" do %>
+    <%= hidden_field_tag :date, @date %>
+
+    <div class="card bg-base-200 border border-base-300 shadow-sm mb-4">
+      <div class="card-body py-4">
+        <h2 class="card-title text-base text-base-content mb-2">Quick actions</h2>
+        <p class="text-sm text-base-content/60 mb-3">Applies to every row below (change before saving).</p>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" data-action="click->attendance-mark#markAllPresent" class="btn btn-success btn-sm">
+            All present
+          </button>
+          <button type="button" data-action="click->attendance-mark#markAllAbsent" class="btn btn-error btn-sm btn-outline">
+            All absent
+          </button>
+          <button type="button" data-action="click->attendance-mark#markAllLate" class="btn btn-warning btn-sm btn-outline">
+            All late
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <%= form_with url: classroom_attendances_path(@classroom), method: :patch, data: { controller: "attendance-mark", turbo_stream: true }, id: "attendance_form" do |f| %>
-    <%= hidden_field_tag :date, @date %>
     <%= turbo_frame_tag "attendance_register" do %>
       <%= render partial: "classrooms/attendances/mark_form_content", locals: {
         students: @students,

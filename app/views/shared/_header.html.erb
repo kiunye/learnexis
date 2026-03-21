@@ -11,20 +11,16 @@
         <span class="sr-only">Open menu</span>
       </label>
 
-      <%# Search input %>
-      <div class="hidden md:flex flex-1 max-w-md" data-controller="search">
-        <div class="relative w-full">
+      <%# Global search %>
+      <div class="hidden md:flex flex-1 max-w-md">
+        <%= form_with url: search_path, method: :get, local: true, class: "relative w-full" do %>
           <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <svg class="w-5 h-5 text-base-content/45" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <input type="text" 
-                 data-search-target="input"
-                 data-action="input->search#handleInput"
-                 placeholder="Search..." 
-                 class="block w-full pl-10 pr-3 py-2 border border-base-300 rounded-lg leading-5 bg-base-100 text-base-content placeholder:text-base-content/45 focus:outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary/40 sm:text-sm" %>
-        </div>
+          <%= search_field_tag :query, params[:query], placeholder: "Search students, invoices, events…", class: "block w-full pl-10 pr-3 py-2 border border-base-300 rounded-lg leading-5 bg-base-100 text-base-content placeholder:text-base-content/45 focus:outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary/40 sm:text-sm" %>
+        <% end %>
       </div>
     </div>
 

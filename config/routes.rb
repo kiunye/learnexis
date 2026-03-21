@@ -8,6 +8,9 @@ Rails.application.routes.draw do
   # Dashboard (role-based)
   get "dashboard", to: "dashboards#show", as: :dashboard
 
+  # Global search (role-scoped)
+  get "search", to: "search#index", as: :search
+
   # Students
   resources :students
 

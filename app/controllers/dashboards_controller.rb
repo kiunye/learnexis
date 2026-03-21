@@ -42,7 +42,7 @@ class DashboardsController < ApplicationController
     pending_fees_amount = invoices_scope.where(status: %i[pending overdue]).sum(:total_amount)
     pending_invoices_count = invoices_scope.where(status: %i[pending overdue]).count
 
-    attendance_scope = Attendance.where(attendance_date: today)
+    attendance_scope = policy_scope(Attendance).where(attendance_date: today)
     attendance_scope =
       if Current.user.parent? || Current.user.student?
         attendance_scope.where(student_id: students_scope.select(:id))
@@ -51,7 +51,7 @@ class DashboardsController < ApplicationController
       end
 
     attendance_total = attendance_scope.count
-    attendance_present = attendance_scope.where(status: Attendance.statuses[:present]).count
+    attendance_present = attendance_scope.where(status: [ Attendance.statuses[:present], Attendance.statuses[:late] ]).count
     attendance_rate =
       if attendance_total.zero?
         nil

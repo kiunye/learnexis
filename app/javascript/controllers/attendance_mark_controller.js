@@ -11,6 +11,10 @@ export default class extends Controller {
     this.setAllStatus("absent")
   }
 
+  markAllLate() {
+    this.setAllStatus("late")
+  }
+
   setAllStatus(status) {
     if (this.hasStatusSelectTarget) {
       this.statusSelectTargets.forEach((select) => {

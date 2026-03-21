@@ -1,4 +1,9 @@
 class TransactionsController < ApplicationController
+  allow_unauthenticated_access only: %i[mpesa_callback]
+  skip_before_action :verify_authenticity_token, only: %i[mpesa_callback]
+
+  before_action :verify_mpesa_webhook_signature!, only: %i[mpesa_callback]
+
   before_action :set_transaction, only: %i[show edit update destroy download]
   before_action :authorize_transaction, only: %i[show edit update destroy download]
 
@@ -79,68 +84,93 @@ class TransactionsController < ApplicationController
     end
   end
 
-    def destroy
-      if @transaction.destroy
-        redirect_to transactions_path, notice: "Transaction deleted successfully."
-      else
-        redirect_to transaction_path(@transaction), alert: "Failed to delete transaction."
-      end
+  def destroy
+    if @transaction.destroy
+      redirect_to transactions_path, notice: "Transaction deleted successfully."
+    else
+      redirect_to transaction_path(@transaction), alert: "Failed to delete transaction."
+    end
+  end
+
+  # M-Pesa callback (webhook — unauthenticated; optional HMAC via MPESA_WEBHOOK_SECRET)
+  def mpesa_callback
+    callback_data = params.except(:controller, :action, :format).to_unsafe_h
+
+    dedupe_key = mpesa_idempotency_cache_key(callback_data)
+    if dedupe_key.present? && Rails.cache.exist?(dedupe_key)
+      render json: { success: true, message: "Duplicate callback ignored" }, status: :ok
+      return
     end
 
-    # M-Pesa Callback
-    def mpesa_callback
-      # In production, this would be a webhook endpoint for M-Pesa provider
-      # For now, we'll simulate handling the callback
+    result = MpesaPaymentService.process_callback(callback_data)
 
-      callback_data = params.except(:controller, :action, :format).to_unsafe_h
+    if result[:success] && result[:data].present?
+      transaction = MpesaPaymentService.record_transaction(result[:data])
 
-      # Process the callback through our service
-      result = MpesaPaymentService.process_callback(callback_data)
-
-      if result[:success] && result[:data].present?
-        # Record the transaction
-        transaction = MpesaPaymentService.record_transaction(result[:data])
-
-        if transaction.present?
-          # Send confirmation SMS/SMS to parents
-          # SmsService.send_payment_confirmation(transaction) # Would implement this
-
-          render json: { success: true, message: "M-Pesa payment processed successfully" }, status: :ok
-        else
-          render json: { success: false, error: "Failed to record transaction" }, status: :unprocessable_entity
-        end
+      if transaction.present?
+        Rails.cache.write(dedupe_key, true, expires_in: 72.hours) if dedupe_key.present?
+        render json: { success: true, message: "M-Pesa payment processed successfully" }, status: :ok
       else
-        render json: { success: false, error: result[:error] || "Invalid callback data" }, status: :unprocessable_entity
+        render json: { success: false, error: "Failed to record transaction" }, status: :unprocessable_entity
       end
+    else
+      render json: { success: false, error: result[:error] || "Invalid callback data" }, status: :unprocessable_entity
+    end
+  end
+
+  # Verify M-Pesa transaction status (staff only)
+  def verify_mpesa
+    authorize Transaction, :verify_mpesa?
+
+    unless Integrations.mpesa_enabled?
+      render json: { success: false, error: "M-Pesa integration is disabled" }, status: :forbidden
+      return
     end
 
-    # Verify M-Pesa transaction status
-    def verify_mpesa
-      reference = params[:reference]
+    reference = params[:reference]
 
-      if reference.blank?
-        render json: { success: false, error: "Reference is required" }, status: :bad_request
-        return
-      end
-
-      result = MpesaPaymentService.query_transaction_status(reference)
-
-      if result[:success]
-        render json: { success: true, data: result[:data] }, status: :ok
-      else
-        render json: { success: false, error: result[:error] }, status: :unprocessable_entity
-      end
+    if reference.blank?
+      render json: { success: false, error: "Reference is required" }, status: :bad_request
+      return
     end
+
+    result = MpesaPaymentService.query_transaction_status(reference)
+
+    if result[:success]
+      render json: { success: true, data: result[:data] }, status: :ok
+    else
+      render json: { success: false, error: result[:error] }, status: :unprocessable_entity
+    end
+  end
 
   def download
     pdf = ReceiptPdfService.build(@transaction)
-    send_data pdf.render,
+    send_data pdf,
               filename: "receipt-#{@transaction.id}.pdf",
               type: "application/pdf",
               disposition: "inline"
   end
 
   private
+
+  def verify_mpesa_webhook_signature!
+    secret = ENV["MPESA_WEBHOOK_SECRET"].to_s
+    return if secret.blank?
+
+    body = request.raw_post.to_s
+    provided = request.headers["X-Learnexis-Mpesa-Signature"].to_s
+    expected = OpenSSL::HMAC.hexdigest("SHA256", secret, body)
+    return if provided.present? && ActiveSupport::SecurityUtils.secure_compare(provided, expected)
+
+    head :unauthorized
+  end
+
+  def mpesa_idempotency_cache_key(callback_data)
+    token = MpesaPaymentService.callback_idempotency_key(callback_data)
+    return nil if token.blank?
+
+    "mpesa/webhook/#{Digest::SHA256.hexdigest(token)}"
+  end
 
   def set_transaction
     @transaction = Transaction.find(params[:id])

@@ -32,11 +32,13 @@ class AttendanceService
         attendance.marked_by = marked_by
         attendance.marked_at = Time.current
 
-        if attendance.save
-          attendances << attendance
-        else
+        unless attendance.save
           @errors.concat(attendance.errors.full_messages)
+          attendances.clear
+          raise ActiveRecord::Rollback
         end
+
+        attendances << attendance
       end
     end
     attendances
@@ -69,18 +71,20 @@ class AttendanceService
 
     student_stats = students.map do |student|
       student_attendances = by_student[student.id] || []
-      present_count = student_attendances.count { |a| a.present? || a.late? }
-      absent_count = student_attendances.count(&:absent?)
+      present_only = student_attendances.count(&:present?)
       late_count = student_attendances.count(&:late?)
+      attended = present_only + late_count
+      absent_count = student_attendances.count(&:absent?)
       excused_count = student_attendances.count(&:excused?)
       total_days = student_attendances.size
-      pct = total_days.positive? ? (present_count.to_f / total_days * 100).round(1) : nil
+      pct = total_days.positive? ? (attended.to_f / total_days * 100).round(1) : nil
 
       {
         student: student,
-        present_count: present_count,
-        absent_count: absent_count,
+        present_only: present_only,
         late_count: late_count,
+        attended: attended,
+        absent_count: absent_count,
         excused_count: excused_count,
         total_days: total_days,
         percentage: pct
@@ -89,11 +93,14 @@ class AttendanceService
 
     daily_totals = date_range.map do |d|
       day_records = by_date[d] || []
+      strict_present = day_records.count(&:present?)
+      late_only = day_records.count(&:late?)
       {
         date: d,
-        present: day_records.count { |a| a.present? || a.late? },
+        attended: strict_present + late_only,
+        present_only: strict_present,
+        late: late_only,
         absent: day_records.count(&:absent?),
-        late: day_records.count(&:late?),
         excused: day_records.count(&:excused?),
         total: day_records.size
       }

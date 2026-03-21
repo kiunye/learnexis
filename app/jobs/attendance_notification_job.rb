@@ -19,6 +19,11 @@ class AttendanceNotificationJob < ApplicationJob
       return
     end
 
+    unless Integrations.sms_enabled?
+      Rails.logger.info "[AttendanceNotificationJob] SMS integration disabled, skipping absence alerts"
+      return
+    end
+
     student = attendance.student
     count = SmsService.send_absence_alert(student, attendance.attendance_date)
     Rails.logger.info "[AttendanceNotificationJob] Sent #{count} absence alert(s) for attendance ##{attendance_id}"

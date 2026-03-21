@@ -1,10 +1,14 @@
 class ReportPolicy < ApplicationPolicy
+  def index?
+    admin? || teacher? || parent?
+  end
+
   def financial?
     admin?
   end
 
   def attendance?
-    admin? || teacher?
+    admin? || teacher? || parent?
   end
 
   def transport?

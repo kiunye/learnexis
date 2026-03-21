@@ -1,0 +1,137 @@
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+  <%= render "reports/report_tabs", current: :attendance %>
+
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">Attendance Report</h2>
+  </div>
+
+  <%# Filters %>
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+      <h3 class="card-title text-lg font-semibold mb-4">Filters</h3>
+      <%= form_with url: attendance_reports_path, method: :get, local: true, class: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" do |f| %>
+        <div class="form-control">
+          <label class="label"><span class="label-text">Start date</span></label>
+          <%= date_field_tag :start_date, params[:start_date] || @start_date, class: "input input-bordered w-full" %>
+        </div>
+        <div class="form-control">
+          <label class="label"><span class="label-text">End date</span></label>
+          <%= date_field_tag :end_date, params[:end_date] || @end_date, class: "input input-bordered w-full" %>
+        </div>
+        <% if @classrooms.any? %>
+          <div class="form-control">
+            <label class="label"><span class="label-text">Classroom</span></label>
+            <%= select_tag :classroom_id,
+                safe_join([
+                  content_tag(:option, "All classrooms", value: ""),
+                  options_from_collection_for_select(@classrooms, :id, :name, params[:classroom_id])
+                ]),
+                class: "select select-bordered w-full" %>
+          </div>
+        <% end %>
+        <% if @students.any? %>
+          <div class="form-control">
+            <label class="label"><span class="label-text">Student</span></label>
+            <%= select_tag :student_id,
+                safe_join([
+                  content_tag(:option, "All students", value: ""),
+                  options_from_collection_for_select(@students, :id, :full_name, params[:student_id])
+                ]),
+                class: "select select-bordered w-full" %>
+          </div>
+        <% end %>
+        <div class="form-control flex flex-end">
+          <label class="label">&nbsp;</label>
+          <%= submit_tag "Apply", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Summary + chart %>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <div class="lg:col-span-2 grid grid-cols-2 md:grid-cols-5 gap-4">
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body py-4">
+        <div class="stat-title text-sm">Total records</div>
+        <div class="stat-value text-lg"><%= @total_records %></div>
+      </div>
+    </div>
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body py-4">
+        <div class="stat-title text-sm">Present</div>
+        <div class="stat-value text-lg text-success"><%= @present_count %></div>
+      </div>
+    </div>
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body py-4">
+        <div class="stat-title text-sm">Absent</div>
+        <div class="stat-value text-lg text-error"><%= @absent_count %></div>
+      </div>
+    </div>
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body py-4">
+        <div class="stat-title text-sm">Late / Excused</div>
+        <div class="stat-value text-lg"><%= @late_count + @excused_count %></div>
+      </div>
+    </div>
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body py-4">
+        <div class="stat-title text-sm">Present %</div>
+        <div class="stat-value text-lg"><%= @present_percent %>%</div>
+      </div>
+    </div>
+    </div>
+    <% if @total_records.positive? %>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h3 class="card-title text-lg font-semibold">Status breakdown</h3>
+          <%= pie_chart(
+                { "Present" => @present_count, "Absent" => @absent_count, "Late" => @late_count, "Excused" => @excused_count }.compact,
+                height: "200px",
+                colors: [ "#10b981", "#ef4444", "#f59e0b", "#6b7280" ],
+                library: { responsive: true }
+              ) %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Table %>
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h3 class="card-title text-lg font-semibold mb-4">Attendance records</h3>
+      <p class="text-sm text-base-content/70 mb-4">From <%= @start_date.strftime("%b %d, %Y") %> to <%= @end_date.strftime("%b %d, %Y") %>. Showing up to 500 most recent.</p>
+      <% if @attendances.any? %>
+        <div class="overflow-x-auto">
+          <table class="table table-zebra w-full">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Student</th>
+                <th>Classroom</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @attendances.each do |attendance| %>
+                <tr>
+                  <td><%= attendance.attendance_date.strftime("%b %d, %Y") %></td>
+                  <td><%= attendance.student.full_name %></td>
+                  <td><%= attendance.classroom&.name %></td>
+                  <td>
+                    <span class="badge <%= case attendance.status when 'present' then 'badge-success' when 'absent' then 'badge-error' when 'late' then 'badge-warning' else 'badge-ghost' end %>">
+                      <%= attendance.status.humanize %>
+                    </span>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-muted-foreground">No attendance records found for the selected filters.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

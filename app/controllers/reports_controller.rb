@@ -1,6 +1,48 @@
 class ReportsController < ApplicationController
   before_action :authorize_report
 
+  # GET /reports
+  def index
+    @start_date = 1.month.ago.to_date
+    @end_date = Date.current
+
+    if policy(:report).financial?
+      range = @start_date..@end_date
+      base = Transaction.where(transaction_date: range)
+      collections = base.payments.sum(:amount)
+      refunds = base.refunds.sum(:amount)
+
+      @financial_summary = {
+        total_collections: collections,
+        total_refunds: refunds,
+        net: collections - refunds
+      }
+    end
+
+    if policy(:report).attendance?
+      att_scope = policy_scope(Attendance).where(attendance_date: @start_date..@end_date)
+      total = att_scope.count
+      present = att_scope.present.count
+
+      @attendance_summary = {
+        total_records: total,
+        present_percent: total.positive? ? (present.to_f / total * 100).round(1) : 0.0
+      }
+    end
+
+    if policy(:report).transport?
+      routes = TransportRoute.all
+      total_students_assigned = routes.sum { |r| r.students.count }
+      total_capacity = routes.sum { |r| r.bus&.capacity || 0 }
+      overall_occupancy = total_capacity.positive? ? (total_students_assigned.to_f / total_capacity * 100).round(1) : 0.0
+
+      @transport_summary = {
+        total_students_assigned: total_students_assigned,
+        overall_occupancy: overall_occupancy
+      }
+    end
+  end
+
   # GET /reports/financial
   def financial
     # Date range for filtering
@@ -53,11 +95,31 @@ class ReportsController < ApplicationController
     end
   end
 
-  # GET /reports/attendance
+  # GET /reports/attendance — role-scoped: admin (all), teacher (their classrooms), parent (their children)
   def attendance
-    # For now, we'll redirect to classroom attendance reports since we don't have a general attendance report
-    # In a real implementation, this would show overall attendance statistics
-    redirect_to classrooms_path, alert: "Attendance reports are available per classroom. Please select a classroom to view its attendance report."
+    @start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : 1.month.ago.beginning_of_month
+    @end_date = params[:end_date].present? ? Date.parse(params[:end_date]) : Date.current
+
+    base = policy_scope(Attendance).includes(student: :user).includes(:classroom)
+    base = base.where(attendance_date: @start_date..@end_date)
+    base = base.where(classroom_id: params[:classroom_id]) if params[:classroom_id].present?
+    base = base.where(student_id: params[:student_id]) if params[:student_id].present?
+
+    @attendances = base.order(attendance_date: :desc, student_id: :asc).limit(500)
+
+    # Summary: counts by status in period
+    summary_scope = policy_scope(Attendance).where(attendance_date: @start_date..@end_date)
+    summary_scope = summary_scope.where(classroom_id: params[:classroom_id]) if params[:classroom_id].present?
+    summary_scope = summary_scope.where(student_id: params[:student_id]) if params[:student_id].present?
+    @total_records = summary_scope.count
+    @present_count = summary_scope.present.count
+    @absent_count = summary_scope.absent.count
+    @late_count = summary_scope.late.count
+    @excused_count = summary_scope.excused.count
+    @present_percent = @total_records.positive? ? (@present_count.to_f / @total_records * 100).round(1) : 0
+
+    @classrooms = policy_scope(Classroom).order(:name)
+    @students = policy_scope(Student).joins(:user).includes(:user).order("users.first_name", "users.last_name")
   end
 
   # GET /reports/transport
@@ -105,8 +167,10 @@ class ReportsController < ApplicationController
   private
 
   def authorize_report
-    # Only admins and teachers can access reports
-    authorize [ :report, params[:action].to_sym ] if action_name.in?([ "financial", "attendance", "transport", "export" ])
+    return unless action_name.in?([ "index", "financial", "attendance", "transport", "export" ])
+
+    # Use ReportPolicy (symbol record), not a namespaced policy.
+    authorize :report, "#{action_name}?"
   end
 
   # CSV generation methods (aligned to ledger: payment / refund / adjustment)
@@ -173,14 +237,27 @@ class ReportsController < ApplicationController
     end
   end
 
-  # PDF generation methods (simplified - in production you'd use Prawn or similar)
+  # PDF generation (Prawn) – returns PDF binary; controller sends via send_data
   def financial_to_pdf
-    # This is a placeholder - in a real app you'd use Prawn to generate a proper PDF
-    "PDF generation would be implemented here using Prawn or similar gem"
+    FinancialReportPdfService.build(
+      start_date: @start_date,
+      end_date: @end_date,
+      total_collections: @total_collections,
+      total_refunds: @total_refunds,
+      total_adjustments: @total_adjustments,
+      net: @net,
+      collections_by_method: @collections_by_method,
+      refunds_by_method: @refunds_by_method,
+      monthly_trend: @monthly_trend
+    )
   end
 
   def transport_to_pdf
-    # This is a placeholder - in a real app you'd use Prawn to generate a proper PDF
-    "PDF generation would be implemented here using Prawn or similar gem"
+    TransportReportPdfService.build(
+      transport_data: @transport_data,
+      total_students_assigned: @total_students_assigned,
+      total_capacity: @total_capacity,
+      overall_occupancy: @overall_occupancy
+    )
   end
 end

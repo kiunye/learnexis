@@ -1,0 +1,77 @@
+<%# Transport report PDF – rendered to HTML then converted to PDF by Grover. %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Transport Report</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; font-size: 11px; color: #000; margin: 0; padding: 0; line-height: 1.4; }
+    .report-header { margin-bottom: 20px; }
+    .report-header .brand { font-size: 14px; font-weight: 700; }
+    .report-header h1 { font-size: 18px; font-weight: 700; margin: 2px 0 4px 0; }
+    .report-header .meta { font-size: 9px; color: #888; }
+    .section-title { font-size: 12px; font-weight: 700; margin: 20px 0 6px 0; }
+    table.data { width: 100%; border-collapse: collapse; font-size: 10px; }
+    table.data th { background: #E8E8E8; font-weight: 700; padding: 8px 10px; text-align: left; }
+    table.data td { padding: 8px 10px; border-bottom: 1px solid #eee; }
+    table.data .num { text-align: right; }
+    .empty-msg { font-size: 10px; color: #666; }
+    .footer-note { margin-top: 24px; font-size: 8px; color: #888; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="report-header">
+    <div class="brand">Learnexis</div>
+    <h1>Transport Report</h1>
+    <div class="meta">Generated: <%= Time.current.strftime('%d %b %Y %H:%M') %></div>
+  </div>
+
+  <div class="section-title">Summary</div>
+  <table class="data">
+    <tr><td>Total Students Assigned</td><td class="num"><%= total_students_assigned %></td></tr>
+    <tr><td>Total Capacity</td><td class="num"><%= total_capacity %></td></tr>
+    <tr><td>Overall Occupancy</td><td class="num"><%= number_with_precision(overall_occupancy, precision: 1) %>%</td></tr>
+  </table>
+
+  <% if transport_data.present? %>
+    <div class="section-title">Route Details</div>
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Route</th>
+          <th>Code</th>
+          <th>Area</th>
+          <th>Bus</th>
+          <th class="num">Students</th>
+          <th class="num">Capacity</th>
+          <th class="num">Occupancy</th>
+          <th class="num">Revenue</th>
+          <th class="num">Seats</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% transport_data.each do |data| %>
+          <% route = data[:route] %>
+          <tr>
+            <td><%= route.name %></td>
+            <td><%= route.route_code %></td>
+            <td><%= route.area.to_s %></td>
+            <td><%= route.bus&.bus_number || "—" %></td>
+            <td class="num"><%= data[:student_count] %></td>
+            <td class="num"><%= data[:capacity] %></td>
+            <td class="num"><%= number_with_precision(data[:occupancy_rate], precision: 1) %>%</td>
+            <td class="num"><%= number_to_currency(data[:monthly_revenue]) %></td>
+            <td class="num"><%= data[:available_seats] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="section-title">Route Details</div>
+    <p class="empty-msg">No transport routes found.</p>
+  <% end %>
+
+  <div class="footer-note">Learnexis Transport Report – Generated <%= Time.current.strftime('%d %b %Y %H:%M') %></div>
+</body>
+</html>

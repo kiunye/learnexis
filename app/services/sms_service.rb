@@ -7,11 +7,15 @@ class SmsService
     # @return [true] on success (or stub success)
     def send_single(phone, message)
       return false if phone.blank?
+      unless Integrations.sms_enabled?
+        Rails.logger.info "[SmsService] Skipped (integration disabled): #{phone.to_s.truncate(20)}"
+        return false
+      end
 
       normalized = phone.to_s.strip
       return false if normalized.blank?
 
-      if Rails.env.development?
+      if Rails.env.local?
         Rails.logger.info "[SmsService] Would send SMS to #{normalized}: #{message.truncate(80)}"
         true
       else

@@ -114,7 +114,7 @@ class InvoicesController < ApplicationController
 
   def download
     pdf = InvoicePdfService.build(@invoice)
-    send_data pdf.render,
+    send_data pdf,
               filename: "invoice-#{@invoice.id}.pdf",
               type: "application/pdf",
               disposition: "inline"

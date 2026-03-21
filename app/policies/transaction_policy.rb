@@ -23,6 +23,10 @@ class TransactionPolicy < ApplicationPolicy
     show?
   end
 
+  def verify_mpesa?
+    admin? || teacher?
+  end
+
   class Scope < ApplicationPolicy::Scope
     def resolve
       if user.admin?

@@ -29,6 +29,10 @@ gem "tailwindcss-rails"
 # Authorization [https://github.com/varvet/pundit]
 gem "pundit"
 
+# Feature flags (SMS / M-Pesa toggles in production)
+gem "flipper"
+gem "flipper-active_record"
+
 # Pagination [https://github.com/ddnexus/pagy]
 gem "pagy"
 
@@ -42,9 +46,8 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "chartkick"
 gem "groupdate"
 
-# PDF generation
-gem "prawn"
-gem "prawn-table"
+# PDF generation (HTML/CSS → PDF via Grover + headless Chrome)
+gem "grover"
 
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
 gem "solid_cache"
@@ -82,6 +85,9 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+  gem "better_errors"
+  gem "binding_of_caller"
+  
 end
 
 group :test do

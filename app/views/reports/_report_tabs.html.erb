@@ -1,0 +1,22 @@
+<%# Sub-nav for report types. Pass current: :financial | :attendance | :transport %>
+<% current_tab = local_assigns.fetch(:current, :financial) %>
+<nav class="tabs tabs-boxed bg-base-200/50 p-1 rounded-lg mb-6" aria-label="Report types">
+  <% if policy(:report).financial? %>
+    <%= link_to financial_reports_path,
+        class: "tab #{current_tab == :financial ? 'tab-active' : ''}" do %>
+      Financial
+    <% end %>
+  <% end %>
+  <% if policy(:report).attendance? %>
+    <%= link_to attendance_reports_path,
+        class: "tab #{current_tab == :attendance ? 'tab-active' : ''}" do %>
+      Attendance
+    <% end %>
+  <% end %>
+  <% if policy(:report).transport? %>
+    <%= link_to transport_reports_path,
+        class: "tab #{current_tab == :transport ? 'tab-active' : ''}" do %>
+      Transport
+    <% end %>
+  <% end %>
+</nav>

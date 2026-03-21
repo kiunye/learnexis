@@ -35,22 +35,14 @@ class ClassroomPolicy < ApplicationPolicy
       if user.admin?
         scope.all
       elsif user.teacher?
-        # Teachers see their own classrooms
-        if user.teacher_profile
-          scope.where(class_teacher_id: user.id)
-        else
-          scope.none
-        end
+        # Class teacher assignment drives access (profile record optional)
+        scope.where(class_teacher_id: user.id)
       elsif user.parent?
         # Parents see classrooms of their children
-        if user.parent_profile
-          scope.joins(:students)
-                .joins("INNER JOIN parent_student_relationships ON parent_student_relationships.student_id = students.id")
-                .where(parent_student_relationships: { parent_id: user.id })
-                .distinct
-        else
-          scope.none
-        end
+        scope.joins(:students)
+              .joins("INNER JOIN parent_student_relationships ON parent_student_relationships.student_id = students.id")
+              .where(parent_student_relationships: { parent_id: user.id })
+              .distinct
       else
         scope.none
       end

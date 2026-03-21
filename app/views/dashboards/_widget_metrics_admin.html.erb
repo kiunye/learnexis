@@ -31,7 +31,7 @@
             <%= @dashboard_data[:attendance_rate].nil? ? "—" : "#{@dashboard_data[:attendance_rate]}%" %>
           </p>
           <p class="mt-1 text-xs text-base-content/55">
-            <%= @dashboard_data[:attendance_total].zero? ? "No marks yet today" : "#{@dashboard_data[:attendance_present]} of #{@dashboard_data[:attendance_total]} present" %>
+            <%= @dashboard_data[:attendance_total].zero? ? "No marks yet today" : "#{@dashboard_data[:attendance_present]} of #{@dashboard_data[:attendance_total]} present or late" %>
           </p>
         </div>
       </div>

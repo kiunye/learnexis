@@ -31,20 +31,10 @@ class StudentPolicy < ApplicationPolicy
       if user.admin?
         scope.all
       elsif user.teacher?
-        # Teachers see students in their classrooms
-        if user.teacher_profile
-          scope.joins(:classroom).where(classrooms: { class_teacher_id: user.id })
-        else
-          scope.none
-        end
+        scope.joins(:classroom).where(classrooms: { class_teacher_id: user.id })
       elsif user.parent?
-        # Parents see only their children
-        if user.parent_profile
-          scope.joins(:parent_student_relationships)
-                .where(parent_student_relationships: { parent_id: user.id })
-        else
-          scope.none
-        end
+        scope.joins(:parent_student_relationships)
+              .where(parent_student_relationships: { parent_id: user.id })
       else
         scope.none
       end
@@ -54,7 +44,7 @@ class StudentPolicy < ApplicationPolicy
   private
 
   def owns_student?
-    user.parent? && user.parent_profile&.students&.include?(record)
+    user.parent? && record.parents.exists?(id: user.id)
   end
 
   def teaches_student?

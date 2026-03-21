@@ -23,8 +23,7 @@ module Classrooms
       date = params[:date].present? ? Date.parse(params[:date]) : Date.current
       date = Date.current if date > Date.current
 
-      raw = permitted_attendances || []
-      records = Array(raw).map do |attrs|
+      records = permitted_attendance_rows.map do |attrs|
         {
           student_id: attrs[:student_id] || attrs["student_id"],
           status: (attrs[:status] || attrs["status"]).presence || "present",
@@ -69,7 +68,7 @@ module Classrooms
     private
 
     def set_classroom
-      @classroom = Classroom.find(params[:classroom_id])
+      @classroom = policy_scope(Classroom).find(params[:classroom_id])
     end
 
     def authorize_attendance
@@ -85,8 +84,26 @@ module Classrooms
       end
     end
 
-    def permitted_attendances
-      params.permit(attendances: %i[student_id status remarks])[:attendances]
+    # Form sends attendances[0][student_id], … — strong params returns a Hash, not an Array.
+    def permitted_attendance_rows
+      raw = params[:attendances]
+      return [] if raw.blank?
+
+      rows =
+        if raw.is_a?(ActionController::Parameters)
+          raw.values
+        elsif raw.is_a?(Hash)
+          raw.values
+        else
+          Array(raw)
+        end
+
+      rows.filter_map do |row|
+        next unless row.is_a?(ActionController::Parameters) || row.is_a?(Hash)
+
+        h = row.is_a?(ActionController::Parameters) ? row.permit(:student_id, :status, :remarks) : row.slice("student_id", "status", "remarks")
+        h.to_h.symbolize_keys
+      end
     end
 
     def attendance_summary_for(attendances_by_student)

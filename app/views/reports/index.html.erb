@@ -1,0 +1,89 @@
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold">Reports Overview</h1>
+    <p class="text-base-content/70 mt-2">
+      High-level summary of key metrics across Financial, Attendance, and Transport.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <% if policy(:report).financial? && @financial_summary.present? %>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-lg font-semibold">Financial</h2>
+          <p class="text-sm text-base-content/70 mb-3">
+            Last 30 days of collections and refunds.
+          </p>
+          <div class="space-y-1 text-sm">
+            <div class="flex justify-between">
+              <span>Collections</span>
+              <span class="font-semibold text-success"><%= number_to_currency(@financial_summary[:total_collections]) %></span>
+            </div>
+            <div class="flex justify-between">
+              <span>Refunds</span>
+              <span class="font-semibold text-error"><%= number_to_currency(@financial_summary[:total_refunds]) %></span>
+            </div>
+            <div class="flex justify-between">
+              <span>Net</span>
+              <span class="font-semibold <%= @financial_summary[:net].to_f >= 0 ? 'text-success' : 'text-error' %>">
+                <%= number_to_currency(@financial_summary[:net]) %>
+              </span>
+            </div>
+          </div>
+          <div class="card-actions justify-end mt-4">
+            <%= link_to "View financial report", financial_reports_path, class: "btn btn-sm btn-primary" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <% if policy(:report).attendance? && @attendance_summary.present? %>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-lg font-semibold">Attendance</h2>
+          <p class="text-sm text-base-content/70 mb-3">
+            Attendance across your accessible students/classrooms for the last 30 days.
+          </p>
+          <div class="space-y-1 text-sm">
+            <div class="flex justify-between">
+              <span>Total records</span>
+              <span class="font-semibold"><%= @attendance_summary[:total_records] %></span>
+            </div>
+            <div class="flex justify-between">
+              <span>Present %</span>
+              <span class="font-semibold text-success"><%= @attendance_summary[:present_percent] %>%</span>
+            </div>
+          </div>
+          <div class="card-actions justify-end mt-4">
+            <%= link_to "View attendance report", attendance_reports_path, class: "btn btn-sm btn-primary" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <% if policy(:report).transport? && @transport_summary.present? %>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-lg font-semibold">Transport</h2>
+          <p class="text-sm text-base-content/70 mb-3">
+            Utilization of buses and routes.
+          </p>
+          <div class="space-y-1 text-sm">
+            <div class="flex justify-between">
+              <span>Students assigned</span>
+              <span class="font-semibold"><%= @transport_summary[:total_students_assigned] %></span>
+            </div>
+            <div class="flex justify-between">
+              <span>Overall occupancy</span>
+              <span class="font-semibold"><%= @transport_summary[:overall_occupancy] %>%</span>
+            </div>
+          </div>
+          <div class="card-actions justify-end mt-4">
+            <%= link_to "View transport report", transport_reports_path, class: "btn btn-sm btn-primary" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+

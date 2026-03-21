@@ -1,61 +1,74 @@
 <% content_for :title, "Attendance - #{@classroom.name}" %>
 
 <div>
-  <div class="mb-6 flex justify-between items-center">
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start">
     <div>
       <div class="breadcrumbs text-sm mb-2">
         <ul>
-          <li><%= link_to "Classrooms", classrooms_path, class: "text-blue-600 hover:text-blue-700" %></li>
-          <li><%= link_to @classroom.name, classroom_path(@classroom), class: "text-blue-600 hover:text-blue-700" %></li>
+          <li><%= link_to "Classrooms", classrooms_path, class: "link link-hover link-primary" %></li>
+          <li><%= link_to @classroom.name, classroom_path(@classroom), class: "link link-hover link-primary" %></li>
           <li>Attendance</li>
         </ul>
       </div>
-      <h1 class="text-3xl font-bold text-gray-900">Attendance Register</h1>
-      <p class="text-gray-600 mt-1"><%= @classroom.name %> • <%= @date.strftime("%A, %B %d, %Y") %></p>
+      <h1 class="text-3xl font-bold text-base-content">Attendance register</h1>
+      <p class="text-base-content/70 mt-1"><%= @classroom.name %> · <%= @date.strftime("%A, %B %d, %Y") %></p>
     </div>
-    <div class="flex gap-2">
+    <div class="flex flex-wrap gap-2">
       <% if policy(@classroom).update? %>
         <%= link_to mark_classroom_attendances_path(@classroom, date: @date), class: "btn btn-primary" do %>
-          Mark Attendance
+          Mark attendance
         <% end %>
       <% end %>
-      <%= link_to reports_classroom_attendances_path(@classroom), class: "btn btn-ghost" do %>
-        Reports
+      <%= link_to reports_classroom_attendances_path(@classroom), class: "btn btn-outline" do %>
+        Class report
+      <% end %>
+      <% if policy(:report).attendance? %>
+        <%= link_to attendance_reports_path, class: "btn btn-ghost" do %>
+          All reports
+        <% end %>
       <% end %>
       <%= link_to classroom_path(@classroom), class: "btn btn-ghost" do %>
-        Back to Classroom
+        Classroom
       <% end %>
     </div>
   </div>
 
-  <%# Date selector %>
-  <%= form_with url: classroom_attendances_path(@classroom), method: :get, local: true, class: "mb-6" do |f| %>
-    <div class="flex gap-2 items-end">
+  <%= form_with url: classroom_attendances_path(@classroom), method: :get, local: true, class: "card bg-base-200 border border-base-300 shadow-sm mb-6" do |f| %>
+    <div class="card-body flex flex-col sm:flex-row sm:flex-wrap sm:items-end gap-4">
       <div class="form-control">
-        <label class="label">
-          <span class="label-text text-gray-700">Date</span>
+        <label class="label pt-0">
+          <span class="label-text font-medium">Date</span>
         </label>
-        <%= f.date_field :date, value: @date, max: Date.current, class: "input input-bordered" %>
+        <%= f.date_field :date, value: @date, max: Date.current, class: "input input-bordered w-full max-w-xs" %>
       </div>
       <%= f.submit "Go", class: "btn btn-primary" %>
     </div>
   <% end %>
 
   <%= turbo_frame_tag "attendance_register" do %>
-    <div class="card bg-white shadow-md">
+    <div class="card bg-base-200 border border-base-300 shadow-sm">
       <div class="card-body">
-        <%= render partial: "classrooms/attendances/register_table", locals: { classroom: @classroom, date: @date, students: @students, attendances_by_student: @attendances_by_student } %>
         <% if @students.empty? %>
-          <div class="text-center py-10">
-            <p class="font-medium text-gray-900">No students in this classroom yet</p>
-            <p class="mt-1 text-sm text-gray-600">Enroll students first, then you can mark attendance for them.</p>
+          <div class="text-center py-12">
+            <div class="text-4xl mb-2" aria-hidden="true">📋</div>
+            <p class="font-medium text-base-content">No students in this classroom</p>
+            <p class="mt-1 text-sm text-base-content/60">Enroll students first, then you can mark attendance.</p>
             <% if policy(@classroom).update? %>
-              <div class="mt-4 flex justify-center gap-2">
+              <div class="mt-6 flex flex-wrap justify-center gap-2">
                 <%= link_to "Enroll students", enroll_students_classroom_path(@classroom), class: "btn btn-primary" %>
                 <%= link_to "Back to classroom", classroom_path(@classroom), class: "btn btn-ghost" %>
               </div>
             <% end %>
           </div>
+        <% else %>
+          <%= render partial: "classrooms/attendances/register_table", locals: { classroom: @classroom, date: @date, students: @students, attendances_by_student: @attendances_by_student } %>
+          <% if policy(@classroom).update? %>
+            <div class="mt-6 flex flex-wrap gap-2">
+              <%= link_to mark_classroom_attendances_path(@classroom, date: @date), class: "btn btn-primary" do %>
+                Mark or update attendance for this date
+              <% end %>
+            </div>
+          <% end %>
         <% end %>
       </div>
     </div>

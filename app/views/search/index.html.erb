@@ -1,0 +1,126 @@
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold">Search</h1>
+      <% if @query.present? %>
+        <p class="text-sm text-base-content/70 mt-1">
+          Results for <span class="font-semibold text-base-content">“<%= @query %>”</span>
+        </p>
+      <% else %>
+        <p class="text-sm text-base-content/70 mt-1">Type at least 2 characters to search.</p>
+      <% end %>
+    </div>
+    <%= form_with url: search_path, method: :get, local: true, class: "w-full max-w-md" do %>
+      <div class="join w-full">
+        <%= search_field_tag :query, @query, placeholder: "Search…", class: "input input-bordered join-item w-full" %>
+        <%= submit_tag "Search", class: "btn btn-primary join-item" %>
+      </div>
+    <% end %>
+  </div>
+
+  <% groups = (@results || {}).fetch(:groups, []) %>
+
+  <% if @query.present? && @query.strip.length >= 2 && groups.empty? %>
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-lg font-semibold">No results</h2>
+        <p class="text-base-content/70">Try a student name, admission number, invoice ID, or reference.</p>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="space-y-6">
+    <% groups.each do |group| %>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="flex items-center justify-between">
+            <h2 class="card-title text-lg font-semibold"><%= group.title %></h2>
+            <% if group.more_type.present? %>
+              <% more_path =
+                case group.more_type
+                when :students
+                  students_path(search: @query)
+                when :classrooms
+                  classrooms_path(search: @query)
+                when :invoices
+                  invoices_path(search: @query)
+                when :transactions
+                  transactions_path(search: @query)
+                when :events
+                  events_path(query: @query)
+                when :notices
+                  notices_path(query: @query)
+                else
+                  nil
+                end %>
+              <% if more_path %>
+                <%= link_to "Open module", more_path, class: "btn btn-sm btn-outline" %>
+              <% end %>
+            <% end %>
+          </div>
+
+          <div class="mt-4 space-y-2">
+            <% group.items.each do |item| %>
+              <%# Students %>
+              <% if item.is_a?(Student) %>
+                <%= link_to student_path(item), class: "flex items-center justify-between p-3 rounded-lg border border-base-300 hover:bg-base-200/50" do %>
+                  <div class="min-w-0">
+                    <div class="font-medium truncate"><%= item.full_name %></div>
+                    <div class="text-sm text-base-content/60 truncate">Admission: <%= item.admission_number %></div>
+                  </div>
+                  <span class="text-sm text-base-content/60">Student</span>
+                <% end %>
+
+              <% elsif item.is_a?(Classroom) %>
+                <%= link_to classroom_path(item), class: "flex items-center justify-between p-3 rounded-lg border border-base-300 hover:bg-base-200/50" do %>
+                  <div class="min-w-0">
+                    <div class="font-medium truncate"><%= item.name %></div>
+                    <div class="text-sm text-base-content/60 truncate">Grade <%= item.grade_level %> • <%= item.section %></div>
+                  </div>
+                  <span class="text-sm text-base-content/60">Classroom</span>
+                <% end %>
+
+              <% elsif item.is_a?(Invoice) %>
+                <%= link_to invoice_path(item), class: "flex items-center justify-between p-3 rounded-lg border border-base-300 hover:bg-base-200/50" do %>
+                  <div class="min-w-0">
+                    <div class="font-medium truncate">Invoice #<%= item.id %> • <%= item.student.full_name %></div>
+                    <div class="text-sm text-base-content/60 truncate">Total: <%= number_to_currency(item.total_amount) %> • Status: <%= item.status.humanize %></div>
+                  </div>
+                  <span class="text-sm text-base-content/60">Invoice</span>
+                <% end %>
+
+              <% elsif item.is_a?(Transaction) %>
+                <%= link_to transaction_path(item), class: "flex items-center justify-between p-3 rounded-lg border border-base-300 hover:bg-base-200/50" do %>
+                  <div class="min-w-0">
+                    <div class="font-medium truncate">Transaction #<%= item.id %> • <%= item.student.full_name %></div>
+                    <div class="text-sm text-base-content/60 truncate"><%= item.transaction_date %> • <%= item.transaction_type.humanize %> • <%= number_to_currency(item.amount) %></div>
+                  </div>
+                  <span class="text-sm text-base-content/60">Transaction</span>
+                <% end %>
+
+              <% elsif item.is_a?(Event) %>
+                <%= link_to event_path(item), class: "flex items-center justify-between p-3 rounded-lg border border-base-300 hover:bg-base-200/50" do %>
+                  <div class="min-w-0">
+                    <div class="font-medium truncate"><%= item.title %></div>
+                    <div class="text-sm text-base-content/60 truncate"><%= item.location %> • <%= l(item.start_datetime, format: :short) if item.start_datetime %></div>
+                  </div>
+                  <span class="text-sm text-base-content/60">Event</span>
+                <% end %>
+
+              <% elsif item.is_a?(Notice) %>
+                <%= link_to notice_path(item), class: "flex items-center justify-between p-3 rounded-lg border border-base-300 hover:bg-base-200/50" do %>
+                  <div class="min-w-0">
+                    <div class="font-medium truncate"><%= item.title %></div>
+                    <div class="text-sm text-base-content/60 truncate"><%= item.published_at&.to_date %></div>
+                  </div>
+                  <span class="text-sm text-base-content/60">Notice</span>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+

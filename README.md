@@ -178,6 +178,7 @@ app/
 - **rubocop-rails-omakase**: Code style enforcement
 - **brakeman**: Security scanning
 - **bundler-audit**: Dependency vulnerability scanning
+- **flipper** / **flipper-active_record**: Feature flags for SMS and M-Pesa in production
 
 ## Environment Configuration
 
@@ -227,6 +228,42 @@ DATABASE_CABLE_URL=postgresql://username:password@hostname:port/cable_db
 - M-Pesa: `MPESA_CONSUMER_KEY`, `MPESA_CONSUMER_SECRET`, `MPESA_SHORTCODE`, `MPESA_PASSKEY`
 - Active Storage (S3): `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_S3_BUCKET`
 - Email (SMTP): `SMTP_ADDRESS`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`
+
+### Integrations, feature flags, and kill switches
+
+SMS (`SmsService`, `AttendanceNotificationJob`) and M-Pesa (`MpesaPaymentService`, `TransactionsController` webhook) are gated by `Integrations` (`app/services/integrations.rb`):
+
+| Environment | Default |
+|-------------|---------|
+| **development** / **test** | Integrations are **on** unless `FORCE_DISABLE_SMS` or `FORCE_DISABLE_MPESA` is truthy (`1`, `true`, `yes`, `on`). |
+| **production** (and other non-local envs) | Requires `ENABLE_SMS=true` **and** `Flipper.enable(:sms)` for SMS; `ENABLE_MPESA=true` **and** `Flipper.enable(:mpesa)` for M-Pesa. |
+
+**Flipper** uses the Active Record adapter in development/production (tables `flipper_features` / `flipper_gates` after `bin/rails db:migrate`). In tests, an in-memory adapter is used.
+
+```bash
+bin/rails runner 'Flipper.enable(:sms); Flipper.enable(:mpesa)'
+# or disable
+bin/rails runner 'Flipper.disable(:sms)'
+```
+
+**M-Pesa webhook hardening**
+
+- `POST /transactions/mpesa_callback` is **unauthenticated** (provider callback). CSRF is skipped for this action only.
+- If `MPESA_WEBHOOK_SECRET` is set, the request must include header `X-Learnexis-Mpesa-Signature` with `OpenSSL::HMAC.hexdigest("SHA256", secret, raw_post_body)` (hex).
+- Successful payments are deduplicated for 72 hours using `Rails.cache` and a key derived from receipt / checkout / transaction id (`MpesaPaymentService.callback_idempotency_key`).
+
+**Staff-only status check:** `GET /transactions/verify_mpesa` requires a signed-in admin or teacher and `Integrations.mpesa_enabled?`.
+
+See `.env.example` for variable names.
+
+### Deployment checklist (Kamal / production)
+
+1. Set `RAILS_MASTER_KEY`, database URLs, `SECRET_KEY_BASE`, and host/SSL as for any Rails 8 app.
+2. Run migrations (includes Flipper tables).
+3. Enable integrations: `ENABLE_SMS` / `ENABLE_MPESA` and run `Flipper.enable` for `:sms` / `:mpesa` as needed.
+4. Set `MPESA_WEBHOOK_SECRET` and configure your M-Pesa provider to send the matching `X-Learnexis-Mpesa-Signature` (or leave unset only behind a trusted network — not recommended on the public internet).
+5. Use PostgreSQL in production; update `config/deploy.yml` server IPs, registry, and uncomment **job** / **accessories** if you split Solid Queue or run a managed database.
+6. Run security checks before release: `bin/brakeman` and `bin/bundler-audit`.
 
 **Important:** Never commit `.env` files to version control. Use your deployment platform's environment variable configuration instead.
 

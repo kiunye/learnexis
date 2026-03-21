@@ -14,7 +14,10 @@
     <div class="flex flex-wrap gap-2">
       <% if Current.user&.admin? || Current.user&.teacher? %>
         <%= link_to "Add student", new_student_path, class: "btn btn-sm btn-primary" %>
-        <%= link_to "Mark attendance", classrooms_path, class: "btn btn-sm btn-outline" %>
+        <%= link_to "Mark attendance", mark_attendance_quick_path, class: "btn btn-sm btn-outline" %>
+      <% end %>
+      <% if Current.user&.parent? && policy(:report).attendance? %>
+        <%= link_to "Attendance report", attendance_reports_path, class: "btn btn-sm btn-outline" %>
       <% end %>
 
       <% if Current.user&.admin? || Current.user&.teacher? || Current.user&.parent? %>
