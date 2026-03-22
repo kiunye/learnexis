@@ -85,4 +85,3 @@ class GlobalSearchService
     end
   end
 end
-

@@ -17,7 +17,7 @@ class FinancialReportPdfService
           refunds_by_method: refunds_by_method,
           monthly_trend: monthly_trend
         },
-        formats: [:html]
+        formats: [ :html ]
       )
       Grover.new(html, **grover_options).to_pdf
     end

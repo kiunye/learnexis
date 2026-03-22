@@ -5,4 +5,3 @@ class SearchPolicy < ApplicationPolicy
     user.present?
   end
 end
-

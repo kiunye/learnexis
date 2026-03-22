@@ -11,7 +11,7 @@ class TransportReportPdfService
           total_capacity: total_capacity,
           overall_occupancy: overall_occupancy
         },
-        formats: [:html]
+        formats: [ :html ]
       )
       Grover.new(html, **grover_options).to_pdf
     end

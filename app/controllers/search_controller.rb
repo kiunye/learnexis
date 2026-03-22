@@ -8,4 +8,3 @@ class SearchController < ApplicationController
     @results = GlobalSearchService.call(user: Current.user, query: @query)
   end
 end
-

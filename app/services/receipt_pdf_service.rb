@@ -6,7 +6,7 @@ class ReceiptPdfService
         template: "transactions/receipt_pdf",
         layout: false,
         assigns: { transaction: transaction },
-        formats: [:html]
+        formats: [ :html ]
       )
       Grover.new(html, **grover_options).to_pdf
     end

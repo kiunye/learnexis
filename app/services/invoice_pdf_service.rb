@@ -28,7 +28,7 @@ class InvoicePdfService
         template: "invoices/pdf",
         layout: false,
         assigns: { invoice: invoice },
-        formats: [:html]
+        formats: [ :html ]
       )
     end
   end
